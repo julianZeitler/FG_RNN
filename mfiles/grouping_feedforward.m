@@ -29,17 +29,17 @@ for l = bPrs.minLevel:bPrs.maxLevel
         % Use inhibition also on the first iteration because the opposing
         % activity is not the same
         
-        if isequal(bPyr1_1(l).orientation(ori).data, bPyr2_2(l).orientation(ori).data) % don't use inhibition on the first iteration
-            gPyr1_1(l).orientation(ori).data = imfilter(bPyr1_1(l).orientation(ori).data,invmsk1);
-            gPyr1_2(l).orientation(ori).data = imfilter(bPyr1_2(l).orientation(ori).data,invmsk2);
-            gPyr2_1(l).orientation(ori).data = imfilter(bPyr2_1(l).orientation(ori).data,invmsk1);
-            gPyr2_2(l).orientation(ori).data = imfilter(bPyr2_2(l).orientation(ori).data,invmsk2);
-        else
-            % opposite border-ownership cells inhibit each other
-            gPyr1_1(l).orientation(ori).data = imfilter(bPyr1_1(l).orientation(ori).data-w.*bPyr2_2(l).orientation(ori).data,invmsk1);
-            gPyr1_2(l).orientation(ori).data = imfilter(bPyr1_2(l).orientation(ori).data-w.*bPyr2_1(l).orientation(ori).data,invmsk2);
-            gPyr2_1(l).orientation(ori).data = imfilter(bPyr2_1(l).orientation(ori).data-w.*bPyr1_2(l).orientation(ori).data,invmsk1);
-            gPyr2_2(l).orientation(ori).data = imfilter(bPyr2_2(l).orientation(ori).data-w.*bPyr1_1(l).orientation(ori).data,invmsk2);
+        % if isequal(bPyr1_1(l).orientation(ori).data, bPyr2_2(l).orientation(ori).data) % don't use inhibition on the first iteration
+        %     gPyr1_1(l).orientation(ori).data = imfilter(bPyr1_1(l).orientation(ori).data,invmsk1);
+        %     gPyr1_2(l).orientation(ori).data = imfilter(bPyr1_2(l).orientation(ori).data,invmsk2);
+        %     gPyr2_1(l).orientation(ori).data = imfilter(bPyr2_1(l).orientation(ori).data,invmsk1);
+        %     gPyr2_2(l).orientation(ori).data = imfilter(bPyr2_2(l).orientation(ori).data,invmsk2);
+        % else
+        %     % opposite border-ownership cells inhibit each other
+        %     gPyr1_1(l).orientation(ori).data = imfilter(bPyr1_1(l).orientation(ori).data-w.*bPyr2_2(l).orientation(ori).data,invmsk1);
+        %     gPyr1_2(l).orientation(ori).data = imfilter(bPyr1_2(l).orientation(ori).data-w.*bPyr2_1(l).orientation(ori).data,invmsk2);
+        %     gPyr2_1(l).orientation(ori).data = imfilter(bPyr2_1(l).orientation(ori).data-w.*bPyr1_2(l).orientation(ori).data,invmsk1);
+        %     gPyr2_2(l).orientation(ori).data = imfilter(bPyr2_2(l).orientation(ori).data-w.*bPyr1_1(l).orientation(ori).data,invmsk2);
 
         % Inhibition as written in the paper. Above implementation
         % inhibits light on dark cells with dark on light and vv. which is
@@ -50,12 +50,12 @@ for l = bPrs.minLevel:bPrs.maxLevel
         % invmsk1 = v_{theta} for theta = 1, ..., 8  
         % invmsk2 = v_{theta} for theta = 9, ..., 16   (in paper)
         % L
-        % gPyr1_1(l).orientation(ori).data = imfilter(bPyr1_1(l).orientation(ori).data-w.*bPyr1_2(l).orientation(ori).data,invmsk1);
-        % gPyr1_2(l).orientation(ori).data = imfilter(bPyr1_2(l).orientation(ori).data-w.*bPyr1_1(l).orientation(ori).data,invmsk2);
-        % % D
-        % gPyr2_1(l).orientation(ori).data = imfilter(bPyr2_1(l).orientation(ori).data-w.*bPyr2_2(l).orientation(ori).data,invmsk1);
-        % gPyr2_2(l).orientation(ori).data = imfilter(bPyr2_2(l).orientation(ori).data-w.*bPyr2_1(l).orientation(ori).data,invmsk2);
-        end
+        gPyr1_1(l).orientation(ori).data = imfilter(bPyr1_1(l).orientation(ori).data-w.*bPyr1_2(l).orientation(ori).data,invmsk1);
+        gPyr1_2(l).orientation(ori).data = imfilter(bPyr1_2(l).orientation(ori).data-w.*bPyr1_1(l).orientation(ori).data,invmsk2);
+        % D
+        gPyr2_1(l).orientation(ori).data = imfilter(bPyr2_1(l).orientation(ori).data-w.*bPyr2_2(l).orientation(ori).data,invmsk1);
+        gPyr2_2(l).orientation(ori).data = imfilter(bPyr2_2(l).orientation(ori).data-w.*bPyr2_1(l).orientation(ori).data,invmsk2);
+        % end
     end
 end
 
