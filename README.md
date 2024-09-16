@@ -1,6 +1,8 @@
 # FG_RNN
 **F**igure-**G**round Organization with a Biologically Plausible **R**ecurrent **N**eural **N**etwork
 
+Based on approach of [Hu et. al. 2019](https://github.com/brianhhu/FG_RNN).
+
 ## Demo
 To run the model,
 1) Run Setup.m for instructions on how to run model.
