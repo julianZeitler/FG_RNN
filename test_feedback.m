@@ -30,57 +30,57 @@ for ori = 1:8
     nexttile([2, 2]); % Make G-cell activity span over two columns
     imagesc(gPyr1(1).data); % G-cell activations L 1_1
     title('G-Cells L');
-    axis off; colormap(gray); colorbar;
+    axis off; colorbar;
 
     % First row for Light (L) B-cells
     nexttile;
     imagesc(bPyr1_1(1).orientation(ori).data, [global_min global_max]); % B-cells L theta
     title('B-Cells L theta');
-    axis off; colormap(gray); colorbar;
+    axis off; colorbar;
 
     nexttile;
     imagesc(bPyr1_2(1).orientation(ori).data, [global_min global_max]); % B-cells L theta+pi
     title('B-Cells L theta+pi');
-    axis off; colormap(gray); colorbar;
+    axis off; colorbar;
 
     % Second row for Light (L) FB-cells
     nexttile;
     imagesc(bPyr1_1_FB(1).orientation(ori).data, [global_min global_max]); % FB-cells L theta
     title('FB B-Cells L theta');
-    axis off; colormap(gray); colorbar;
+    axis off; colorbar;
 
     nexttile;
     imagesc(bPyr1_2_FB(1).orientation(ori).data, [global_min global_max]); % FB-cells L theta+pi
     title('FB B-Cells L theta+pi');
-    axis off; colormap(gray); colorbar;
+    axis off; colorbar;
 
     % Plot the G-cell activations for Dark (gPyr2)
     nexttile([2, 2]);
     imagesc(gPyr2(1).data); % G-cell activations D 2_1
     title('G-Cells D');
-    axis off; colormap(gray); colorbar;
+    axis off; colorbar;
 
     % Third row for Dark (D) B-cells
     nexttile;
     imagesc(bPyr2_1(1).orientation(ori).data, [global_min global_max]); % B-cells D theta
     title('B-Cells D theta');
-    axis off; colormap(gray); colorbar;
+    axis off; colorbar;
 
     nexttile;
     imagesc(bPyr2_2(1).orientation(ori).data, [global_min global_max]); % B-cells D theta+pi
     title('B-Cells D theta+pi');
-    axis off; colormap(gray); colorbar;
+    axis off; colorbar;
 
     % Fourth row for Dark (D) FB-cells
     nexttile;
     imagesc(bPyr2_1_FB(1).orientation(ori).data, [global_min global_max]); % FB-cells D theta
     title('FB B-Cells D theta');
-    axis off; colormap(gray); colorbar;
+    axis off; colorbar;
 
     nexttile;
     imagesc(bPyr2_2_FB(1).orientation(ori).data, [global_min global_max]); % FB-cells D theta+pi
     title('FB B-Cells D theta+pi');
-    axis off; colormap(gray); colorbar;
+    axis off; colorbar;
 
     % Adjust layout size
     set(gcf, 'Position', [100, 100, 1200, 900]); % Adjust figure size
