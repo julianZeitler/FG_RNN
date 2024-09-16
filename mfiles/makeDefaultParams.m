@@ -67,9 +67,9 @@ end
 params.giPrs.w_sameChannel = 1;% Inhibitory weight for same channel inhibition
 
 params.bPrs.exp_decay = 3;        % alpha
-params.bPRs.FF.inhibition = 1;    % delta
-params.bPRs.FF.spatial_neighborhood = gaussianFilter2D(13, 13, 3, 3);
-params.bPRs.FB.scale = 1;           % lambda
-params.bPRs.FB.offset = 0;          % T_offset
-params.bPRs.FB.inhibition = 1;    % gamma
-params.bPRs.FB.spatial_neighborhood = gaussianFilter2D(13, 13, 3, 3);
+params.bPrs.FF.inhibition = 1;    % delta
+params.bPrs.FF.spatial_neighborhood = gaussianFilter2D(13, 13, 3, 3);
+params.bPrs.FB.scale = 1;           % lambda
+params.bPrs.FB.offset = 0;          % T_offset
+params.bPrs.FB.inhibition = 1;    % gamma
+params.bPrs.FB.spatial_neighborhood = gaussianFilter2D(13, 13, 3, 3);

@@ -2,17 +2,24 @@ load("test_feedback.mat");
 
 % Define parameters
 params.bPrs.exp_decay = 3;        % alpha
-params.bPRs.FF.inhibition = 1;    % delta
-params.bPRs.FF.spatial_neighborhood = gaussianFilter2D(13, 13, 1, 1);
+params.bPrs.FF.inhibition = 1;    % delta
+params.bPrs.FF.spatial_neighborhood = gaussianFilter2D(13, 13, 1, 1);
 
-params.bPRs.FB.scale = 1;           % lambda
-params.bPRs.FB.offset = 0;          % T_offset
-params.bPRs.FB.inhibition = 1;    % gamma
-params.bPRs.FB.spatial_neighborhood = gaussianFilter2D(13, 13, 1, 1);
+params.bPrs.FB.scale = 1;           % lambda
+params.bPrs.FB.offset = 0;          % T_offset
+params.bPrs.FB.inhibition = 1;    % gamma
+params.bPrs.FB.spatial_neighborhood = gaussianFilter2D(13, 13, 1, 1);
 
 [bPyr1_1_FB, bPyr1_2_FB, bPyr2_1_FB, bPyr2_2_FB, cPyr_FB] = grouping_feedback(gPyr1, gPyr2, bPyr1_1, bPyr1_2, bPyr2_1, bPyr2_2, cPyr, params);
 
 for ori = 1:8
+    all_data = [bPyr1_1(1).orientation(ori).data(:); bPyr1_2(1).orientation(ori).data(:); ...
+                bPyr2_1(1).orientation(ori).data(:); bPyr2_2(1).orientation(ori).data(:); ...
+                bPyr1_1_FB(1).orientation(ori).data(:); bPyr1_2_FB(1).orientation(ori).data(:); ...
+                bPyr2_1_FB(1).orientation(ori).data(:); bPyr2_2_FB(1).orientation(ori).data(:)];
+    global_min = min(all_data);
+    global_max = max(all_data);
+
     figure;
     sgtitle(['Orientation ', num2str(ori)]); % Title for the figure
 
@@ -27,23 +34,23 @@ for ori = 1:8
 
     % First row for Light (L) B-cells
     nexttile;
-    imagesc(bPyr1_1(1).orientation(ori).data); % B-cells L theta
+    imagesc(bPyr1_1(1).orientation(ori).data, [global_min global_max]); % B-cells L theta
     title('B-Cells L theta');
     axis off; colormap(gray); colorbar;
 
     nexttile;
-    imagesc(bPyr1_2(1).orientation(ori).data); % B-cells L theta+pi
+    imagesc(bPyr1_2(1).orientation(ori).data, [global_min global_max]); % B-cells L theta+pi
     title('B-Cells L theta+pi');
     axis off; colormap(gray); colorbar;
 
     % Second row for Light (L) FB-cells
     nexttile;
-    imagesc(bPyr1_1_FB(1).orientation(ori).data); % FB-cells L theta
+    imagesc(bPyr1_1_FB(1).orientation(ori).data, [global_min global_max]); % FB-cells L theta
     title('FB B-Cells L theta');
     axis off; colormap(gray); colorbar;
 
     nexttile;
-    imagesc(bPyr1_2_FB(1).orientation(ori).data); % FB-cells L theta+pi
+    imagesc(bPyr1_2_FB(1).orientation(ori).data, [global_min global_max]); % FB-cells L theta+pi
     title('FB B-Cells L theta+pi');
     axis off; colormap(gray); colorbar;
 
@@ -55,26 +62,29 @@ for ori = 1:8
 
     % Third row for Dark (D) B-cells
     nexttile;
-    imagesc(bPyr2_1(1).orientation(ori).data); % B-cells D theta
+    imagesc(bPyr2_1(1).orientation(ori).data, [global_min global_max]); % B-cells D theta
     title('B-Cells D theta');
     axis off; colormap(gray); colorbar;
 
     nexttile;
-    imagesc(bPyr2_2(1).orientation(ori).data); % B-cells D theta+pi
+    imagesc(bPyr2_2(1).orientation(ori).data, [global_min global_max]); % B-cells D theta+pi
     title('B-Cells D theta+pi');
     axis off; colormap(gray); colorbar;
 
     % Fourth row for Dark (D) FB-cells
     nexttile;
-    imagesc(bPyr2_1_FB(1).orientation(ori).data); % FB-cells D theta
+    imagesc(bPyr2_1_FB(1).orientation(ori).data, [global_min global_max]); % FB-cells D theta
     title('FB B-Cells D theta');
     axis off; colormap(gray); colorbar;
 
     nexttile;
-    imagesc(bPyr2_2_FB(1).orientation(ori).data); % FB-cells D theta+pi
+    imagesc(bPyr2_2_FB(1).orientation(ori).data, [global_min global_max]); % FB-cells D theta+pi
     title('FB B-Cells D theta+pi');
     axis off; colormap(gray); colorbar;
 
     % Adjust layout size
     set(gcf, 'Position', [100, 100, 1200, 900]); % Adjust figure size
 end
+
+% figure; imagesc(params.bPrs.FF.spatial_neighborhood); colorbar;
+% figure; imagesc(params.bPrs.FB.spatial_neighborhood); colorbar;
