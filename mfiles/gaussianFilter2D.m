@@ -14,6 +14,7 @@ function filter = gaussianFilter2D(sizeX, sizeY, sigmaX, sigmaY)
     filter = exp(- (X.^2 / (2 * sigmaX^2) + Y.^2 / (2 * sigmaY^2)));
     
     % Normalize the Gaussian filter so that its values range from 0 to 1
-    filter = filter - min(filter(:)); % Shift values so the minimum is 0
-    filter = filter / max(filter(:)); % Scale values so the maximum is 1
+    % filter = filter - min(filter(:)); % Shift values so the minimum is 0
+    % filter = filter / max(filter(:)); % Scale values so the maximum is 1
+    filter = filter/sum(filter, "all");
 end

@@ -56,6 +56,32 @@ for l = bPrs.minLevel:bPrs.maxLevel
         bPyr2_2(l).orientation(ori).data = (P2_2 + D2_2)./Norm2_2;
         bPyr2_2(l).orientation(ori).data(bPyr2_2(l).orientation(ori).data<0 | isnan(bPyr2_2(l).orientation(ori).data)) = 0;
 
+        % plot feedback activity
+        if l == 1
+            figure;
+            t = tiledlayout(2, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
+            sgtitle(['Orientation ', num2str(ori)]);
+    
+            nexttile; 
+            imagesc(D1_1); % Plot D1_1
+            title(['FB L Ori ', num2str(ori)]);
+            axis off; colorbar;
+    
+            nexttile; 
+            imagesc(D1_2); % Plot D1_2
+            title(['FB L Ori ', num2str(ori), ' + pi']);
+            axis off; colorbar;
+    
+            nexttile; 
+            imagesc(D2_1); % Plot D2_1
+            title(['FB D Ori ', num2str(ori)]);
+            axis off; colorbar;
+    
+            nexttile; 
+            imagesc(D2_2); % Plot D2_2
+            title(['FB D Ori ', num2str(ori), ' + pi']);
+            axis off; colorbar
+        end
     end
 end
 

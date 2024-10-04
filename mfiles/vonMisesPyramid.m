@@ -18,8 +18,7 @@ for ori = 1:vmPrs.numOri
     for l = vmPrs.minLevel:vmPrs.maxLevel  
         if ~(isempty(map(l)))
             
-            % msk_1 is inverted to invmsk1 (v_{theta + pi}) in paper
-            % notation
+            % msk_1 is inverted to invmsk1 (v_{theta + pi} in paper notation)
             pyr1(l).orientation(ori).data = imfilter(map(l).data,vmPrs.msk_1{ori});
             msk1(l).orientation(ori).data = vmPrs.msk_2{ori};
             pyr1(l).orientation(ori).ori = vmPrs.oris(ori)+pi/2;

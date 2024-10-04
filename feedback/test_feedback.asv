@@ -1,0 +1,127 @@
+close all;
+params = makeParams();
+% stimulus = rgb2gray(imread("G:\Meine Ablage\Studium\Master\Project Modulatory Feedback\FG_RNN\images\12074.jpg"));
+% dimensions = size(stimulus);
+% dimensions = [200 200];
+% stimulus = verticalContrastStimulus(dimensions(1), dimensions(2));
+% stimulus = squareStimulus(dimensions(1), dimensions(2), 50);
+% stimulus = changingBackground(dimensions(1), dimensions(2), 50);  
+
+% Initialize activities to zero
+for ori=1:params.B.numOri
+    B1.orientation(ori).data = zeros(dimensions(1), dimensions(2));
+    B2.orientation(ori).data = zeros(dimensions(1), dimensions(2));
+    E.orientation(ori).data = zeros(dimensions(1), dimensions(2));
+end
+G = zeros(dimensions(1), dimensions(2));
+% G(:, 101:103) = 10; % Bias the G-cells towards the right side
+
+% corfresponse contains contrasts, oriensMatrix contains the orientation of
+% contrasts at each spatial location
+[~,~,corfresponse,oriensMatrix] = CORFContourDetection(stimulus,2.2,4,1.8);
+oriensMatrix = mod(round(oriensMatrix/(2*pi)*16)+4,16)+1; % convert orientations to indices
+
+for ori=1:params.B.numOri
+    % Combine opposite contrast polarities at each orientation
+    E.orientation(ori).data = corfresponse.*(oriensMatrix==ori) + corfresponse.*(oriensMatrix==ori+8);
+end
+
+% Original figure for G-cells, B1 (orientation 5), and B2 (orientation 5)
+% figure; tiledlayout(3, params.iterations, 'TileSpacing', 'tight', 'Padding', 'tight'); 
+
+% Separate figures for 2D plot of averaged B1 and B2 activities
+figureB1 = figure; hold on;
+figureB2 = figure; hold on;
+
+% Initialize arrays to store average B1 and B2 activities
+avgB1_over_iterations = zeros(1, params.iterations);
+avgB2_over_iterations = zeros(1, params.iterations);
+
+for idx=1:params.iterations % Loop through all iterations
+    [B1, B2] = calculateBCellActivities(E, B1, B2, G, params);
+    G = calculateGCellActivities(B1, B2, params);
+    
+    % Average B1 and B2 over orientations and the entire array (calculate one scalar)
+    avgB1_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B1.orientation(:).data}));
+    avgB2_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B2.orientation(:).data}));
+
+    % Original Plot: G-cell, B1 (orientation 5), B2 (orientation 5)
+    
+    % Plot G-cell activity in row 1, column idx
+    % figure(1);
+    % nexttile(idx); % 1st row
+    % imagesc(G); 
+    % title(['Iteration ', num2str(idx), ' G-cells']);
+    % colorbar; axis off;
+    % 
+    % % Plot B1 activity (ori = 5) in row 2, column idx
+    % nexttile(idx + params.iterations); % 2nd row
+    % imagesc(B1.orientation(5).data); 
+    % title('B1 \theta=5');
+    % colorbar; axis off;
+    % 
+    % % Plot B2 activity (ori = 5) in row 3, column idx
+    % nexttile(idx + 2*params.iterations); % 3rd row
+    % imagesc(B2.orientation(5).data); 
+    % title('B2 \theta=5');
+    % colorbar; axis off;
+end
+
+% Additional Plot: 2D graph for average B1 activity
+figure(figureB1);
+plot(1:params.iterations, avgB1_over_iterations, '-o', 'LineWidth', 2);
+title('Average B1 Activity Over Iterations');
+xlabel('Iteration');
+ylabel('Average Activity');
+grid on;
+
+% Additional Plot: 2D graph for average B2 activity
+figure(figureB2);
+plot(1:params.iterations, avgB2_over_iterations, '-o', 'LineWidth', 2);
+title('Average B2 Activity Over Iterations');
+xlabel('Iteration');
+ylabel('Average Activity');
+grid on;
+
+% Set the positions of the figures
+% set(figure(1), 'Position', [100, 100, 1200, 600]); % Original plot
+
+figure; imagesc(G); colorbar; axis off;
+% figure; imagesc(B1.orientation(5).data); colorbar; axis off;
+% figure; imagesc(B2.orientation(5).data); colorbar; axis off;
+
+
+% Visualize
+% figure; imagesc(stimulus); colormap(gray); axis off;
+% figure; imagesc(corfresponse); axis image; axis off; colormap(gray);
+% BOS
+
+% figure; imagesc(B1.orientation(1).data - B2.orientation(1).data); colorbar;
+% figure; imagesc(B1.orientation(5).data - B2.orientation(5).data); colorbar;
+
+figure; 
+tiledlayout(3, 8, 'TileSpacing', 'tight', 'Padding', 'tight');
+
+% Loop over orientations (1 to 8)
+for ori = 1:8
+    % Plot B1 cells for each orientation in the first row
+    nexttile(ori); % First row
+    imagesc(B1.orientation(ori).data);
+    title(['B1 \theta=', num2str(ori)]);
+    colorbar; axis off;
+    
+    % Plot B2 cells for each orientation in the second row
+    nexttile(ori + 8); % Second row
+    imagesc(B2.orientation(ori).data);
+    title(['B2 \theta=', num2str(ori)]);
+    colorbar; axis off;
+    
+    % Plot BOS signal for each orientation in the third row
+    nexttile(ori + 16); % Third row
+    BOS_signal = B1.orientation(ori).data - B2.orientation(ori).data;
+    imagesc(BOS_signal);
+    title(['BOS \theta=', num2str(ori)]);
+    colorbar; axis off;
+end
+
+set(gcf, 'Position', [50, 50, 1800, 500]);
