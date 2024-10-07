@@ -50,6 +50,7 @@ params.B.exp_decay = 2;      % alpha
 params.B.saturation = 0.5;         % zeta
 params.B.FF.scale = 1;          % beta
 params.B.FF.inhibition = 12;     % delta
+params.B.FF.ori_norm = 1;
 params.B.FF.spatial_neighborhood_exc = gaussianFilter2D(20*R1-1, 20*R1-1, R1, R1);
 % params.B.FF.spatial_neighborhood_exc = gaussianFilter2D(3*R0, 3*R0, R0/8, R0/8);
 % params.B.FF.spatial_neighborhood_exc = zeros(3, 3);
