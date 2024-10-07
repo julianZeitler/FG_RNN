@@ -1,4 +1,4 @@
-function [arr] = squareStimulus(dim1,dim2,squareSize)
+function [arr] = squareStimulus(dim1,dim2,squareSize, amplitude)
 %SQUARE Summary of this function goes here
 %   Detailed explanation goes here
 arr = zeros(dim1, dim2);
@@ -7,6 +7,6 @@ arr = zeros(dim1, dim2);
 startIdx = (dim1 - squareSize) / 2 + 1;
 endIdx = startIdx + squareSize - 1;
 
-arr(startIdx:endIdx, startIdx:endIdx) = 1;
+arr(startIdx:endIdx, startIdx:endIdx) = amplitude;
 end
 

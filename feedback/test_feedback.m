@@ -1,11 +1,13 @@
-close all;
+close all; clear;
 params = makeParams();
-% stimulus = rgb2gray(imread("G:\Meine Ablage\Studium\Master\Project Modulatory Feedback\FG_RNN\images\12074.jpg"));
+% stimulus = rgb2gray(imread("G:\Meine Ablage\Studium\Master\Project Modulatory Feedback\FG_RNN\images\42049.jpg"));
 % dimensions = size(stimulus);
 dimensions = [200 200];
+% stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
 % stimulus = verticalContrastStimulus(dimensions(1), dimensions(2));
-stimulus = squareStimulus(dimensions(1), dimensions(2), 50);
-% stimulus = changingBackground(dimensions(1), dimensions(2), 50);  
+stimulus = changingBackground(dimensions(1), dimensions(2), 50);
+% stimulus = verticalBarStimulus(dimensions(1), dimensions(2), 50);
+% stimulus = vaseStimulus(200, 200, 5, 50);
 
 % Initialize activities to zero
 for ori=1:params.B.numOri
@@ -42,31 +44,10 @@ for idx=1:params.iterations % Loop through all iterations
     
     G = calculateGCellActivities(B1, B2, params);
 
-    
     % Average B1 and B2 over orientations and the entire array (calculate one scalar)
     avgB1_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B1.orientation(:).data}));
     avgB2_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B2.orientation(:).data}));
 
-    % Original Plot: G-cell, B1 (orientation 5), B2 (orientation 5)
-    
-    % Plot G-cell activity in row 1, column idx
-    % figure(1);
-    % nexttile(idx); % 1st row
-    % imagesc(G); 
-    % title(['Iteration ', num2str(idx), ' G-cells']);
-    % colorbar; axis off;
-    % 
-    % % Plot B1 activity (ori = 5) in row 2, column idx
-    % nexttile(idx + params.iterations); % 2nd row
-    % imagesc(B1.orientation(5).data); 
-    % title('B1 \theta=5');
-    % colorbar; axis off;
-    % 
-    % % Plot B2 activity (ori = 5) in row 3, column idx
-    % nexttile(idx + 2*params.iterations); % 3rd row
-    % imagesc(B2.orientation(5).data); 
-    % title('B2 \theta=5');
-    % colorbar; axis off;
 end
 
 % Additional Plot: 2D graph for average B1 activity
@@ -85,21 +66,11 @@ xlabel('Iteration');
 ylabel('Average Activity');
 grid on;
 
-% Set the positions of the figures
-% set(figure(1), 'Position', [100, 100, 1200, 600]); % Original plot
-
 figure; imagesc(G); colorbar; axis off;
-% figure; imagesc(B1.orientation(5).data); colorbar; axis off;
-% figure; imagesc(B2.orientation(5).data); colorbar; axis off;
 
-
-% Visualize
+%% Visualize
 % figure; imagesc(stimulus); colormap(gray); axis off;
 % figure; imagesc(corfresponse); axis image; axis off; colormap(gray);
-% BOS
-
-% figure; imagesc(B1.orientation(1).data - B2.orientation(1).data); colorbar;
-% figure; imagesc(B1.orientation(5).data - B2.orientation(5).data); colorbar;
 
 figure; 
 tiledlayout(3, 8, 'TileSpacing', 'tight', 'Padding', 'tight');

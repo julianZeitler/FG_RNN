@@ -23,13 +23,13 @@ ori = [0 22.5 45 67.5]; % 8 orientations
 oris = deg2rad([ori (ori+90)]);
 
 % G-cell parameters
-params.G.inhibition = 0;
-params.G.scale = 700;
+R0 = 25;
+params.G.scale = 1;
+params.G.inhibition_neighborhood = gaussianFilter2D(2*R0, 2*R0, 1, 1);
 params.G.minLevel = minLevel;
 params.G.maxLevel = maxLevel;
 params.G.oris = oris;
 params.G.numOri = length(oris);
-R0 = 25;
 
 % create RF (Receptive Field) for G-cells
 dim1 = -3*R0:3*R0;

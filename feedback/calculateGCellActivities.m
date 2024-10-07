@@ -11,7 +11,6 @@ for ori=1:params.B.numOri
     G(G<0 | isnan(G)) = 0; % set invalid data to 0
 end
 G = G/params.B.numOri; % normalize
-% G = 10*G/max(G, [], "all");
-% G = 5*2*((1./(1+exp(-G))) - 0.5);
+G = G/(15*mean(G, "all"));
 end
 
