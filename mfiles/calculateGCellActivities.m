@@ -1,4 +1,5 @@
 function [G] = calculateGCellActivities(B1, B2, params)
+% Calculate G-Cells with incoming B1 and B2 activities.
 
 for ori=1:params.B.numOri
     % collect excitatory B-cell activity from B1 and B2
@@ -10,7 +11,7 @@ for ori=1:params.B.numOri
     % end
     G(G<0 | isnan(G)) = 0; % set invalid data to 0
 end
-G = G/params.B.numOri; % normalize
-G = G./(params.G.exp_decay + params.G.inhibition_strength*imfilter(G, params.G.inhibition_neighborhood));
+G = G/params.B.numOri;
+G = G./(params.G.exp_decay + params.G.inhibition_strength*imfilter(G, params.G.inhibition_neighborhood)); % normalize
 end
 

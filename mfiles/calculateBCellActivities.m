@@ -1,6 +1,9 @@
 function [B1Out,B2Out] = calculateBCellActivities(E, B1, B2, G, params)
 % calculateBCellActivities Calculate the activity of B-cells based on E-
 %   and G-cell activities
+%
+% B1 and B2 are opposing B-cells. 1=Theta> and 2 = Theta<, according to
+% paper notation.
 
 for ori=1:params.B.numOri
     %% B1-Activity

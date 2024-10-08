@@ -1,6 +1,6 @@
 close all; clear;
 params = makeParams();
-stimulus = rgb2gray(imread("G:\Meine Ablage\Studium\Master\Project Modulatory Feedback\FG_RNN\images\42049.jpg"));
+stimulus = rgb2gray(imread("images\42049.jpg"));
 dimensions = size(stimulus);
 % dimensions = [200 200];
 % stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
@@ -16,7 +16,6 @@ for ori=1:params.B.numOri
     E.orientation(ori).data = zeros(dimensions(1), dimensions(2));
 end
 G = zeros(dimensions(1), dimensions(2));
-% G(:, 101:103) = 10; % Bias the G-cells towards the right side
 
 % corfresponse contains contrasts, oriensMatrix contains the orientation of
 % contrasts at each spatial location
