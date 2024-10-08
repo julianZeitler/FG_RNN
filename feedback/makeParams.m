@@ -25,7 +25,9 @@ oris = deg2rad([ori (ori+90)]);
 % G-cell parameters
 R0 = 25;
 params.G.scale = 1;
-params.G.inhibition_neighborhood = gaussianFilter2D(2*R0, 2*R0, 1, 1);
+params.G.exp_decay = 0.0015;
+params.G.inhibition_strength = 0.3;
+params.G.inhibition_neighborhood = gaussianFilter2D(10*R0-mod(10*R0,2), 10*R0-mod(10*R0,2), 3*R0, 3*R0);
 params.G.minLevel = minLevel;
 params.G.maxLevel = maxLevel;
 params.G.oris = oris;

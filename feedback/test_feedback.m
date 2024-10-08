@@ -3,10 +3,10 @@ params = makeParams();
 % stimulus = rgb2gray(imread("G:\Meine Ablage\Studium\Master\Project Modulatory Feedback\FG_RNN\images\42049.jpg"));
 % dimensions = size(stimulus);
 dimensions = [200 200];
-stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
+% stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
 % stimulus = verticalContrastStimulus(dimensions(1), dimensions(2));
 % stimulus = changingBackground(dimensions(1), dimensions(2), 50);
-% stimulus = verticalBarStimulus(dimensions(1), dimensions(2), 50);
+stimulus = verticalBarStimulus(dimensions(1), dimensions(2), 50);
 % stimulus = vaseStimulus(200, 200, 5, 50);
 
 % Initialize activities to zero

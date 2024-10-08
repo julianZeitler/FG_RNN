@@ -11,6 +11,6 @@ for ori=1:params.B.numOri
     G(G<0 | isnan(G)) = 0; % set invalid data to 0
 end
 G = G/params.B.numOri; % normalize
-G = G/(15*mean(G, "all"));
+G = G./(params.G.exp_decay + params.G.inhibition_strength*imfilter(G, params.G.inhibition_neighborhood));
 end
 
