@@ -45,7 +45,7 @@ for ori=1:params.B.numOri
             OriNorm2 = OriNorm2 + B2.orientation(i).data * weights(i) + max(weights) * B1.orientation(i).data;
         end
     end
-    Norm2 = params.B.exp_decay + params.B.FF.inhibition * imfilter(E.orientation(ori).data, params.B.FF.spatial_neighborhood_inh) + params.B.FB.inhibition * imfilter(B1.orientation(ori).data, params.B.FB.spatial_neighborhood) + params.B.saturation * (P1.*(1 + D1)) + params.B.FF.ori_norm * OriNorm2;
+    Norm2 = params.B.exp_decay + params.B.FF.inhibition * imfilter(E.orientation(ori).data, params.B.FF.spatial_neighborhood_inh) + params.B.FB.inhibition * imfilter(B1.orientation(ori).data, params.B.FB.spatial_neighborhood) + params.B.saturation * (P2.*(1 + D2)) + params.B.FF.ori_norm * OriNorm2;
     
     % Assign values to output and finalize calculation
     B2Out.orientation(ori).data = params.B.FF.scale*(P2.*(1 + D2))./(Norm2);
