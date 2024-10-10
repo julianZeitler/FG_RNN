@@ -1,6 +1,6 @@
 close all; clear;
 params = makeParams();
-stimulus = rgb2gray(imread("images\42049.jpg"));
+stimulus = rgb2gray(imread("images\12074.jpg"));
 dimensions = size(stimulus);
 % dimensions = [200 200];
 % stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
@@ -10,11 +10,10 @@ dimensions = size(stimulus);
 % stimulus = vaseStimulus(200, 200, 5, 50);
 
 % Initialize activities to zero
-for ori=1:params.B.numOri
-    B1.orientation(ori).data = zeros(dimensions(1), dimensions(2));
-    B2.orientation(ori).data = zeros(dimensions(1), dimensions(2));
-    E.orientation(ori).data = zeros(dimensions(1), dimensions(2));
-end
+
+B1 = zeros(params.numOri, dimensions(1), dimensions(2));
+B2 = zeros(params.numOri, dimensions(1), dimensions(2));
+E = zeros(params.numOri, dimensions(1), dimensions(2));
 G = zeros(dimensions(1), dimensions(2));
 
 % corfresponse contains contrasts, oriensMatrix contains the orientation of
@@ -22,9 +21,9 @@ G = zeros(dimensions(1), dimensions(2));
 [~,~,corfresponse,oriensMatrix] = CORFContourDetection(stimulus,2.2,4,1.8);
 oriensMatrix = mod(round(oriensMatrix/(2*pi)*16)+4,16)+1; % convert orientations to indices
 
-for ori=1:params.B.numOri
+for ori=1:params.numOri
     % Combine opposite contrast polarities at each orientation
-    E.orientation(ori).data = corfresponse.*(oriensMatrix==ori) + corfresponse.*(oriensMatrix==ori+8);
+    E(ori, :, :) = corfresponse.*(oriensMatrix==ori) + corfresponse.*(oriensMatrix==ori+8);
 end
 
 % Original figure for G-cells, B1 (orientation 5), and B2 (orientation 5)
@@ -44,8 +43,8 @@ for idx=1:params.iterations % Loop through all iterations
     G = calculateGCellActivities(B1, B2, params);
 
     % Average B1 and B2 over orientations and the entire array (calculate one scalar)
-    avgB1_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B1.orientation(:).data}));
-    avgB2_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B2.orientation(:).data}));
+    avgB1_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B1}));
+    avgB2_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B2}));
 
 end
 
@@ -78,19 +77,19 @@ tiledlayout(3, 8, 'TileSpacing', 'tight', 'Padding', 'tight');
 for ori = 1:8
     % Plot B1 cells for each orientation in the first row
     nexttile(ori); % First row
-    imagesc(B1.orientation(ori).data);
+    imagesc(squeeze(B1(ori,:,:)));
     title(['B1 \theta=', num2str(ori)]);
     colorbar; axis off;
     
     % Plot B2 cells for each orientation in the second row
     nexttile(ori + 8); % Second row
-    imagesc(B2.orientation(ori).data);
+    imagesc(squeeze(B2(ori,:,:)));
     title(['B2 \theta=', num2str(ori)]);
     colorbar; axis off;
     
     % Plot BOS signal for each orientation in the third row
     nexttile(ori + 16); % Third row
-    BOS_signal = B1.orientation(ori).data - B2.orientation(ori).data;
+    BOS_signal = squeeze(B1(ori,:,:)) - squeeze(B2(ori,:,:));
     imagesc(BOS_signal);
     title(['BOS \theta=', num2str(ori)]);
     colorbar; axis off;
