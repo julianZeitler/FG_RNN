@@ -4,6 +4,8 @@ function [B1Out,B2Out] = calculateBCellActivities(E, B1, B2, G, params)
 %
 % B1 and B2 are opposing B-cells. 1=Theta> and 2 = Theta<, according to
 % paper notation.
+B1Out = zeros(params.numOri, size(B1,2), size(B1,3));
+B2Out = zeros(params.numOri, size(B2,2), size(B2,3));
 
 for ori=1:params.numOri
     %% B1-Activity
@@ -28,7 +30,8 @@ for ori=1:params.numOri
     % Assign values to output and finalize calculation
     B1Out(ori,:,:) = params.B.FF.scale*(P1.*(1 + D1))./(Norm1);
     % B1Out.orientation(ori).data = params.B.FF.scale*(P1 + D1)./(Norm1);
-    B1(ori,:,:) = max(0, B1(ori,:,:)); % remove negative values
+    B1Out(ori,:,:) = max(0, B1Out(ori,:,:)); % remove negative values
+    B1Out(isnan(B1Out)) = 0;
 
     %% B2-Activity
     % Perisomatic Input (FF)
@@ -53,6 +56,7 @@ for ori=1:params.numOri
     B2Out(ori,:,:) = params.B.FF.scale*(P2.*(1 + D2))./(Norm2);
     % B2Out.orientation(ori).data = params.B.FF.scale*(P2 + D2)./(Norm2);
     B2Out(ori,:,:) = max(0, B2Out(ori,:,:)); % remove negative values
+    B2Out(isnan(B2Out)) = 0;
 end
 end
 

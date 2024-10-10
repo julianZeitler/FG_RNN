@@ -30,12 +30,10 @@ end
 % figure; tiledlayout(3, params.iterations, 'TileSpacing', 'tight', 'Padding', 'tight'); 
 
 % Separate figures for 2D plot of averaged B1 and B2 activities
-figureB1 = figure; hold on;
-figureB2 = figure; hold on;
+figureB = figure; hold on;
 
 % Initialize arrays to store average B1 and B2 activities
-avgB1_over_iterations = zeros(1, params.iterations);
-avgB2_over_iterations = zeros(1, params.iterations);
+avgB_over_iterations = zeros(1, params.iterations);
 
 for idx=1:params.iterations % Loop through all iterations
     [B1, B2] = calculateBCellActivities(E, B1, B2, G, params);
@@ -43,23 +41,13 @@ for idx=1:params.iterations % Loop through all iterations
     G = calculateGCellActivities(B1, B2, params);
 
     % Average B1 and B2 over orientations and the entire array (calculate one scalar)
-    avgB1_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B1}));
-    avgB2_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B2}));
-
+    avgB_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B1})) + mean(cellfun(@(x) mean(x(:)), {B2}));
 end
 
 % Additional Plot: 2D graph for average B1 activity
-figure(figureB1);
-plot(1:params.iterations, avgB1_over_iterations, '-o', 'LineWidth', 2);
-title('Average B1 Activity Over Iterations');
-xlabel('Iteration');
-ylabel('Average Activity');
-grid on;
-
-% Additional Plot: 2D graph for average B2 activity
-figure(figureB2);
-plot(1:params.iterations, avgB2_over_iterations, '-o', 'LineWidth', 2);
-title('Average B2 Activity Over Iterations');
+figure(figureB);
+plot(1:params.iterations, avgB_over_iterations, '-o', 'LineWidth', 2);
+title('Average B Activity Over Iterations');
 xlabel('Iteration');
 ylabel('Average Activity');
 grid on;
