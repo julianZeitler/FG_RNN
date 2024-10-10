@@ -1,9 +1,9 @@
 close all; clear;
 params = makeParams();
-% stimulus = rgb2gray(imread("images\12074.jpg"));
-% dimensions = size(stimulus);
-dimensions = [200 200];
-stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
+stimulus = rgb2gray(imread("images\42049.jpg"));
+dimensions = size(stimulus);
+% dimensions = [200 200];
+% stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
 % stimulus = verticalContrastStimulus(dimensions(1), dimensions(2));
 % stimulus = changingBackground(dimensions(1), dimensions(2), 50);
 % stimulus = verticalBarStimulus(dimensions(1), dimensions(2), 50);
@@ -26,14 +26,9 @@ for ori=1:params.numOri
     E(ori, :, :) = corfresponse.*(oriensMatrix==ori) + corfresponse.*(oriensMatrix==ori+8);
 end
 
-% Original figure for G-cells, B1 (orientation 5), and B2 (orientation 5)
-% figure; tiledlayout(3, params.iterations, 'TileSpacing', 'tight', 'Padding', 'tight'); 
-
-% Separate figures for 2D plot of averaged B1 and B2 activities
-figureB = figure; hold on;
-
-% Initialize arrays to store average B1 and B2 activities
+% Initialize arrays to store average B activities and BOS-Signals
 avgB_over_iterations = zeros(1, params.iterations);
+BOS_over_iterations = zeros(params.iterations, dimensions(1), dimensions(2), 3);
 
 for idx=1:params.iterations % Loop through all iterations
     [B1, B2] = calculateBCellActivities(E, B1, B2, G, params);
@@ -42,25 +37,38 @@ for idx=1:params.iterations % Loop through all iterations
 
     % Average B1 and B2 over orientations and the entire array (calculate one scalar)
     avgB_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B1})) + mean(cellfun(@(x) mean(x(:)), {B2}));
+    % BOS-Signal
+    BOS_over_iterations(idx,:,:,:) = getBOS(B1, B2, params, "unnormalized");
 end
 
-% Additional Plot: 2D graph for average B1 activity
-figure(figureB);
+%% Visualize
+% 2D graph for average B activity
+figure;
 plot(1:params.iterations, avgB_over_iterations, '-o', 'LineWidth', 2);
 title('Average B Activity Over Iterations');
 xlabel('Iteration');
 ylabel('Average Activity');
 grid on;
 
-figure; imagesc(G); colorbar; axis off;
+% Plot BOS over iterations
+BOS_over_iterations(:,:,:,2) = BOS_over_iterations(:,:,:,2)/max(BOS_over_iterations(:,:,:,2), [], "all"); % normalize over all iterations
+figure; tiledlayout(1, params.iterations, 'TileSpacing','tight','Padding','tight');
+for idx=1:params.iterations
+    nexttile(idx);
+    imagesc(hsv2rgb(squeeze(BOS_over_iterations(idx,:,:,:))));
+    title(['Iteration: ', num2str(idx)]);
+    axis off;
+end
 
-%% Visualize
+% Miscellaneous
+figure; imagesc(G); colorbar; axis off;
 figure; imagesc(stimulus); colormap(gray); axis off; colorbar;
 figure; imagesc(corfresponse); axis image; axis off; colormap(gray); colorbar;
 
 figure; 
 tiledlayout(3, 8, 'TileSpacing', 'tight', 'Padding', 'tight');
 
+% Plot B and BOS for each iteration
 % Loop over orientations (1 to 8)
 for ori = 1:8
     % Plot B1 cells for each orientation in the first row
@@ -85,23 +93,3 @@ end
 
 set(gcf, 'Position', [50, 50, 1800, 500]);
 
-BOS = zeros(dimensions(1), dimensions(2), 3);
-
-for i=1:dimensions(1)
-    for j=1:dimensions(2)
-        [max_val,max_idx] = max(B1(:,i,j)-B2(:,i,j));
-        [min_val,min_idx] = min(B1(:,i,j)-B2(:,i,j));
-        if abs(max_val) > abs(min_val)
-            BOS(i,j,1) = params.oris(max_idx)/(2*pi);
-            BOS(i,j,2) = abs(max_val*40);
-            BOS(i,j,3) = 1;
-        else
-            BOS(i,j,1) = (params.oris(min_idx)+pi)/(2*pi);
-            BOS(i,j,2) = abs(min_val*40);
-            BOS(i,j,3) = 1;
-        end
-
-    end
-end
-
-figure; imagesc(hsv2rgb(BOS));
