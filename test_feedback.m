@@ -1,9 +1,9 @@
 close all; clear;
 params = makeParams();
-stimulus = rgb2gray(imread("images\12074.jpg"));
-dimensions = size(stimulus);
-% dimensions = [200 200];
-% stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
+% stimulus = rgb2gray(imread("images\12074.jpg"));
+% dimensions = size(stimulus);
+dimensions = [200 200];
+stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
 % stimulus = verticalContrastStimulus(dimensions(1), dimensions(2));
 % stimulus = changingBackground(dimensions(1), dimensions(2), 50);
 % stimulus = verticalBarStimulus(dimensions(1), dimensions(2), 50);
@@ -84,3 +84,24 @@ for ori = 1:8
 end
 
 set(gcf, 'Position', [50, 50, 1800, 500]);
+
+BOS = zeros(dimensions(1), dimensions(2), 3);
+
+for i=1:dimensions(1)
+    for j=1:dimensions(2)
+        [max_val,max_idx] = max(B1(:,i,j)-B2(:,i,j));
+        [min_val,min_idx] = min(B1(:,i,j)-B2(:,i,j));
+        if abs(max_val) > abs(min_val)
+            BOS(i,j,1) = params.oris(max_idx)/(2*pi);
+            BOS(i,j,2) = abs(max_val*40);
+            BOS(i,j,3) = 1;
+        else
+            BOS(i,j,1) = (params.oris(min_idx)+pi)/(2*pi);
+            BOS(i,j,2) = abs(min_val*40);
+            BOS(i,j,3) = 1;
+        end
+
+    end
+end
+
+figure; imagesc(hsv2rgb(BOS));
