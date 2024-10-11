@@ -4,21 +4,26 @@ function [B1Out,B2Out] = calculateBCellActivities(E, B1, B2, G, params)
 %
 % B1 and B2 are opposing B-cells. 1=Theta> and 2 = Theta<, according to
 % paper notation.
-B1Out = zeros(params.numOri, size(B1,2), size(B1,3));
-B2Out = zeros(params.numOri, size(B2,2), size(B2,3));
+B1Out = zeros(params.num_ori, size(B1,2), size(B1,3));
+B2Out = zeros(params.num_ori, size(B2,2), size(B2,3));
 
-for ori=1:params.numOri
+for ori=1:params.num_ori
     %% B1-Activity
     % Perisomatic Input (FF)
     P1 = imfilter(squeeze(E(ori,:,:)), params.B.FF.spatial_neighborhood_exc);
     % Distal Input (FB)
     % D1 = params.B.FB.scale * B1.orientation(ori).data .* (2 * ((1./(1+exp(-(imfilter(G, params.G.RF{ori+8}))))) - params.B.FB.offset)); % Distal Input (FB)
-    D1 = params.B.FB.scale * (2 * ((1./(1+exp(-(imfilter(G, params.G.RF{ori+8}))))) - params.B.FB.offset)); % Distal Input (FB)
+    FB1 = zeros(size(B1,2), size(B1,3));
+    for k=1:params.G.num_scales
+        FB1 = FB1 + imfilter(squeeze(G(k,:,:)), params.G.RF{k,ori+8});
+    end
+    FB1 = FB1/params.G.num_scales;
+    D1 = params.B.FB.scale * (2 * ((1./(1+exp(-FB1))) - params.B.FB.offset)); % Distal Input (FB)
 
     % Normalization
-    weights = gaussianFilter1DCircular(params.numOri, ori, 1);
+    weights = gaussianFilter1DCircular(params.num_ori, ori, 1);
     weights = max(weights) - weights;
-    for i=1:params.numOri
+    for i=1:params.num_ori
         if i == 1
             OriNorm1 = squeeze(B1(i,:,:)) * weights(i) + max(weights) * squeeze(B2(i,:,:));
         else
@@ -38,12 +43,17 @@ for ori=1:params.numOri
     P2 = imfilter(squeeze(E(ori,:,:)), params.B.FF.spatial_neighborhood_exc);
     % Distal Input (FB)
     % D2 = params.B.FB.scale * B2.orientation(ori).data .* (2 * ((1./(1+exp(-(imfilter(G, params.G.RF{ori}))))) - params.B.FB.offset)); % Distal Input (FB)
-    D2 = params.B.FB.scale * (2 * ((1./(1+exp(-(imfilter(G, params.G.RF{ori}))))) - params.B.FB.offset)); % Distal Input (FB)
+    FB2 = zeros(size(B2,2), size(B2,3));
+    for k=1:params.G.num_scales
+        FB2 = FB2 + imfilter(squeeze(G(k,:,:)), params.G.RF{k,ori});
+    end
+    FB2 = FB2/params.G.num_scales;
+    D2 = params.B.FB.scale * (2 * ((1./(1+exp(-FB2))) - params.B.FB.offset)); % Distal Input (FB)
 
     % Normalization
-    weights = gaussianFilter1DCircular(params.numOri, ori, 1);
+    weights = gaussianFilter1DCircular(params.num_ori, ori, 1);
     weights = max(weights) - weights;
-    for i=1:params.numOri
+    for i=1:params.num_ori
         if i == 1
             OriNorm2 = squeeze(B2(i,:,:)) * weights(i) + max(weights) * squeeze(B1(i,:,:));
         else

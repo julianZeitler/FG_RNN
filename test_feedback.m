@@ -1,6 +1,6 @@
 close all; clear;
 params = makeParams();
-stimulus = rgb2gray(imread("images\42049.jpg"));
+stimulus = rgb2gray(imread("images\156079.jpg"));
 dimensions = size(stimulus);
 % dimensions = [200 200];
 % stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
@@ -11,17 +11,17 @@ dimensions = size(stimulus);
 
 % Initialize activities to zero
 
-B1 = zeros(params.numOri, dimensions(1), dimensions(2));
-B2 = zeros(params.numOri, dimensions(1), dimensions(2));
-E = zeros(params.numOri, dimensions(1), dimensions(2));
-G = zeros(dimensions(1), dimensions(2));
+B1 = zeros(params.num_ori, dimensions(1), dimensions(2));
+B2 = zeros(params.num_ori, dimensions(1), dimensions(2));
+E = zeros(params.num_ori, dimensions(1), dimensions(2));
+G = zeros(params.G.num_scales, dimensions(1), dimensions(2));
 
 % corfresponse contains contrasts, oriensMatrix contains the orientation of
 % contrasts at each spatial location
 [~,~,corfresponse,oriensMatrix] = CORFContourDetection(stimulus,2.2,4,1.8);
 oriensMatrix = mod(round(oriensMatrix/(2*pi)*16)+4,16)+1; % convert orientations to indices
 
-for ori=1:params.numOri
+for ori=1:params.num_ori
     % Combine opposite contrast polarities at each orientation
     E(ori, :, :) = corfresponse.*(oriensMatrix==ori) + corfresponse.*(oriensMatrix==ori+8);
 end
@@ -61,7 +61,7 @@ for idx=1:params.iterations
 end
 
 % Miscellaneous
-figure; imagesc(G); colorbar; axis off;
+figure; imagesc(squeeze(sum(G))); colorbar; axis off;
 figure; imagesc(stimulus); colormap(gray); axis off; colorbar;
 figure; imagesc(corfresponse); axis image; axis off; colormap(gray); colorbar;
 
