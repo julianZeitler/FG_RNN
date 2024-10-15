@@ -29,8 +29,8 @@ for i=1:dimensions(1)
     for j=1:dimensions(2)
         % for each pixel, sum the BOS-vectors represented by their
         % orientation (edge ori +/- pi/2) and length (BOS-strength)
-        % Rotate oris +90° to go from edge orientation to BOS-orientation.
-        [X, Y] = pol2cart(params.oris+pi/2, (B1(:,i,j)-B2(:,i,j)).');
+        % Rotate oris -90° to go from edge orientation to BOS-orientation.
+        [X, Y] = pol2cart(params.oris-pi/2, (B1(:,i,j)-B2(:,i,j)).');
         [theta, rho] = cart2pol(sum(X), sum(Y)); % Perform addition in cartesian coordinates
         theta = wrapTo2Pi(theta);
 
