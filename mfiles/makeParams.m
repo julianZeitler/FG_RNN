@@ -24,10 +24,8 @@ params.G.inhibition_neighborhood = gaussianFilter2D(10*R0-mod(10*R0,2), 10*R0-mo
 % create RFs (Receptive Fields) for G-cells
 for k=1:params.G.num_scales
     R = R0*params.G.scale_step^(k-1);
-    dim1 = round(-3*R:3*R);
-    dim2 = dim1;
     for ori = 1:params.num_ori
-        [params.G.RF{k,ori}, params.G.RF{k,ori+8}] = makeVonMises(R,params.oris(ori)+pi/2,dim1,dim2);
+        [params.G.RF{k,ori}, params.G.RF{k,ori+8}] = makeGRF(R, params.oris(ori)+pi/2, 0.1);
     end
 end
 
@@ -40,13 +38,13 @@ params.B.saturation = 0.5;      % zeta
 params.B.FF.scale = 1;          % beta
 params.B.FF.inhibition = 12;    % delta
 params.B.FF.ori_norm = 1;
-params.B.FF.spatial_neighborhood_exc = gaussianFilter2D(20*R1-mod(20*R1,2), 20*R1-mod(20*R1,2), R1, R1);
-params.B.FF.spatial_neighborhood_inh = gaussianFilter2D(20*R1-mod(20*R1,2), 20*R1-mod(20*R1,2), R1*2, R1*2);
+params.B.FF.spatial_neighborhood_exc = gaussianFilter2D(20*R1+(1-mod(20*R1,2)), 20*R1+(1-mod(20*R1,2)), R1, R1);
+params.B.FF.spatial_neighborhood_inh = gaussianFilter2D(20*R1+(1-mod(20*R1,2)), 20*R1+(1-mod(20*R1,2)), R1*2, R1*2);
 
 params.B.FB.scale = 2;          % lambda
 params.B.FB.offset = 0.5;       % T_offset
 params.B.FB.inhibition = 100;   % gamma
-params.B.FB.spatial_neighborhood = gaussianFilter2D(20*R1-mod(20*R1,2), 20*R1-mod(20*R1,2), R1*2, R1*2);
+params.B.FB.spatial_neighborhood = gaussianFilter2D(20*R1+(1-mod(20*R1,2)), 20*R1+(1-mod(20*R1,2)), R1*2, R1*2);
 
 end
 
