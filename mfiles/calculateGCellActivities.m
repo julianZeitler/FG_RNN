@@ -14,7 +14,7 @@ for k=1:params.G.num_scales
         G(isnan(G)) = 0; % set invalid values to zero
     end
     G(k,:,:) = G(k,:,:)/params.num_ori;
-    G(k,:,:) = squeeze(G(k,:,:))./(params.G.exp_decay + params.G.inhibition_strength*imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood)); % normalize
+    G(k,:,:) = squeeze(G(k,:,:))./(params.G.exp_decay + params.G.inhibition_strength*imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood{k})); % normalize
 end
 end
 

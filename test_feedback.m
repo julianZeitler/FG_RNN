@@ -1,13 +1,16 @@
 close all; clear;
 params = makeParams();
-stimulus = rgb2gray(imread("images\156079.jpg"));
-dimensions = size(stimulus);
-% dimensions = [200 200];
+% stimulus = rgb2gray(imread("images\12074.jpg"));
+% dimensions = size(stimulus);
+dimensions = [200 200];
 % stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
 % stimulus = verticalContrastStimulus(dimensions(1), dimensions(2));
 % stimulus = changingBackground(dimensions(1), dimensions(2), 50);
 % stimulus = verticalBarStimulus(dimensions(1), dimensions(2), 50);
-% stimulus = vaseStimulus(200, 200, 5, 50);
+stimulus = vaseStimulus(200, 200, 5, 50);
+
+% save = true;
+save = false;
 
 % Initialize activities to zero
 
@@ -50,6 +53,10 @@ xlabel('Iteration');
 ylabel('Average Activity');
 grid on;
 
+if save
+    saveas(gcf, 'output/feedback/average_B_activity.png');
+end
+
 % Plot BOS over iterations
 BOS_over_iterations(:,:,:,2) = BOS_over_iterations(:,:,:,2)/max(BOS_over_iterations(:,:,:,2), [], "all"); % normalize over all iterations
 figure; tiledlayout(1, params.iterations, 'TileSpacing','tight','Padding','tight');
@@ -59,11 +66,22 @@ for idx=1:params.iterations
     title(['Iteration: ', num2str(idx)]);
     axis off;
 end
+set(gcf, "Position", [100,100,3000,250]);
+if save
+    saveas(gcf, 'output/feedback/BOS_development.png');
+end
 
 % Miscellaneous
 figure; imagesc(squeeze(sum(G))); colorbar; axis off;
-figure; imagesc(stimulus); colormap(gray); axis off; colorbar;
-figure; imagesc(corfresponse); axis image; axis off; colormap(gray); colorbar;
+if save
+    saveas(gcf, 'output/feedback/summed_G.png');
+end
+figure; imagesc(hsv2rgb(getBOS(B1, B2, params)));
+if save
+    saveas(gcf, 'output/feedback/BOS.png');
+end
+% figure; imagesc(stimulus); colormap(gray); axis off; colorbar;
+% figure; imagesc(corfresponse); axis image; axis off; colormap(gray); colorbar;
 
 figure; 
 tiledlayout(3, 8, 'TileSpacing', 'tight', 'Padding', 'tight');

@@ -1,4 +1,4 @@
-function [RF1, RF2] = makeGRF(R0, theta0, sigma_phi, k)
+function [RF1, RF2] = makeGRF(R0, theta0, sigma_phi)
 %MAKEGRF Create RFs for G-cells using the Difference of Gaussians operator
 % to create an off-center on-surround filter mask
 %   inputs:

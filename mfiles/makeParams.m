@@ -17,16 +17,24 @@ R0 = 2;
 params.G.num_scales = 10;
 params.G.scale_step = sqrt(2);
 params.G.scale = 1;
-params.G.exp_decay = 0.0015;
-params.G.inhibition_strength = 0.3;
-params.G.inhibition_neighborhood = gaussianFilter2D(10*R0-mod(10*R0,2), 10*R0-mod(10*R0,2), 3*R0, 3*R0);
+params.G.exp_decay = 0.001;
+params.G.inhibition_strength = 2;
+params.G.inhibition_neighborhood{1} = gaussianFilter2D(10*R0-mod(10*R0,2), 10*R0-mod(10*R0,2), 3*R0, 3*R0);
 
 % create RFs (Receptive Fields) for G-cells
-for k=1:params.G.num_scales
-    R = R0*params.G.scale_step^(k-1);
+dim = -3*R0:3*R0;
+for ori = 1:params.num_ori
+    [params.G.RF{1,ori}, params.G.RF{1,ori+8}] = makeVonMises(R0, params.oris(ori)+pi/2, dim, dim);
+end
+for k=2:params.G.num_scales
     for ori = 1:params.num_ori
-        [params.G.RF{k,ori}, params.G.RF{k,ori+8}] = makeGRF(R, params.oris(ori)+pi/2, 0.1);
+        params.G.RF{k,ori} = imresize(params.G.RF{1, ori}, params.G.scale_step^(k-1), "cubic");
+        params.G.RF{k,ori} = params.G.RF{k,ori}/sum(params.G.RF{k,ori}, "all");
+        params.G.RF{k,ori+8} = imresize(params.G.RF{1, ori+8}, params.G.scale_step^(k-1), "cubic");
+        params.G.RF{k,ori+8} = params.G.RF{k,ori+8}/sum(params.G.RF{k,ori+8}, "all");
     end
+
+    params.G.inhibition_neighborhood{k} = gaussianFilter2D(10*R0*params.G.scale_step^k-mod(10*R0*params.G.scale_step^k,2), 10*R0*params.G.scale_step^k-mod(10*R0*params.G.scale_step^k,2), 3*R0*params.G.scale_step^k, 3*R0*params.G.scale_step^k);
 end
 
 %% B-cell parameters (FF=FeedForward, FB=FeedBack)

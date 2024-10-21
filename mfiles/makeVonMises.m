@@ -32,13 +32,11 @@ theta = atan2(Y,X);
 %make masks
 msk1 =exp(B.*cos(theta-(theta0)))./besseli(0,R-R0);
 msk1(R==0) = 0; % added by bh
-msk1 = msk1/sum(msk1, "all"); % normalize to 1
-% msk1 = msk1*2/R0;
+msk1 = msk1/sum(msk1, "all");
 
 msk2 = exp(B.*cos(theta-(theta0+pi)))./besseli(0,R-R0);
 msk2(R==0) = 0; % added by bh
-msk2 = msk2/sum(msk2, "all"); % normalize to 1
-% msk2 = msk2*2/R0;
+msk2 = msk2/sum(msk2, "all");
 
 % added by bh to avoid overlapping RFs
 msk1_final = msk1.*((msk1 - msk2) > eps);
