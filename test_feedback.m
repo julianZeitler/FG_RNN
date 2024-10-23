@@ -110,4 +110,6 @@ for ori = 1:8
 end
 
 set(gcf, 'Position', [50, 50, 1800, 500]);
-
+if save
+    saveas(gcf, 'output/feedback/B_BOS.png');
+end
