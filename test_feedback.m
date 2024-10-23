@@ -1,21 +1,21 @@
 close all; clear;
 params = makeParams();
-% stimulus = rgb2gray(imread("images\12074.jpg"));
-% dimensions = size(stimulus);
-dimensions = [200 200];
+stimulus = rgb2gray(imread("images\42049.jpg"));
+dimensions = size(stimulus);
+% dimensions = [200 200];
 % stimulus = squareStimulus(dimensions(1), dimensions(2), 50, 1);
 % stimulus = verticalContrastStimulus(dimensions(1), dimensions(2));
 % stimulus = changingBackground(dimensions(1), dimensions(2), 50);
 % stimulus = verticalBarStimulus(dimensions(1), dimensions(2), 50);
-stimulus = vaseStimulus(200, 200, 5, 50);
+% stimulus = vaseStimulus(200, 200, 5, 50);
 
-% save = true;
-save = false;
+save = true;
+% save = false;
 
 % Initialize activities to zero
 
-B1 = zeros(params.num_ori, dimensions(1), dimensions(2));
-B2 = zeros(params.num_ori, dimensions(1), dimensions(2));
+B1 = zeros(params.G.num_scales, params.num_ori, dimensions(1), dimensions(2));
+B2 = zeros(params.G.num_scales, params.num_ori, dimensions(1), dimensions(2));
 E = zeros(params.num_ori, dimensions(1), dimensions(2));
 G = zeros(params.G.num_scales, dimensions(1), dimensions(2));
 
@@ -41,7 +41,7 @@ for idx=1:params.iterations % Loop through all iterations
     % Average B1 and B2 over orientations and the entire array (calculate one scalar)
     avgB_over_iterations(idx) = mean(cellfun(@(x) mean(x(:)), {B1})) + mean(cellfun(@(x) mean(x(:)), {B2}));
     % BOS-Signal
-    BOS_over_iterations(idx,:,:,:) = getBOS(B1, B2, params, "unnormalized");
+    BOS_over_iterations(idx,:,:,:) = getBOS(squeeze(sum(B1,1)), squeeze(sum(B2,1)), params, "unnormalized");
 end
 
 %% Visualize
@@ -76,7 +76,7 @@ figure; imagesc(squeeze(sum(G))); colorbar; axis off;
 if save
     saveas(gcf, 'output/feedback/summed_G.png');
 end
-figure; imagesc(hsv2rgb(getBOS(B1, B2, params)));
+figure; imagesc(hsv2rgb(getBOS(squeeze(sum(B1,1)), squeeze(sum(B2,1)), params)));
 if save
     saveas(gcf, 'output/feedback/BOS.png');
 end
@@ -91,19 +91,19 @@ tiledlayout(3, 8, 'TileSpacing', 'tight', 'Padding', 'tight');
 for ori = 1:8
     % Plot B1 cells for each orientation in the first row
     nexttile(ori); % First row
-    imagesc(squeeze(B1(ori,:,:)));
+    imagesc(squeeze(sum(B1(:,ori,:,:))));
     title(['B1 \theta=', num2str(ori)]);
     colorbar; axis off;
-    
+
     % Plot B2 cells for each orientation in the second row
     nexttile(ori + 8); % Second row
-    imagesc(squeeze(B2(ori,:,:)));
+    imagesc(squeeze(sum(B2(:,ori,:,:))));
     title(['B2 \theta=', num2str(ori)]);
     colorbar; axis off;
-    
+
     % Plot BOS signal for each orientation in the third row
     nexttile(ori + 16); % Third row
-    BOS_signal = squeeze(B1(ori,:,:)) - squeeze(B2(ori,:,:));
+    BOS_signal = squeeze(sum(B1(:,ori,:,:)))-squeeze(sum(B2(:,ori,:,:)));
     imagesc(BOS_signal);
     title(['BOS \theta=', num2str(ori)]);
     colorbar; axis off;
