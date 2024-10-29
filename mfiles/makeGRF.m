@@ -11,15 +11,17 @@ function [RF1, RF2] = makeGRF(R0, theta0, sigma_phi)
 %       RF1: filter mask
 %       RF2: Filter mask offset by pi
 
-[X, Y] = meshgrid(-3*R0:3*R0, 3*R0:-1:-3*R0);
+[X, Y] = meshgrid(round(-2*R0):round(2*R0), round(2*R0):-1:round(-2*R0));
 [phi, rho] = cart2pol(X, Y);
 
 sigma_rho = R0^1.5/10;
 
+phi = wrapTo2Pi(phi);
+
 % Construct covariance matrix from eigenvectors and -values
 Sigma = [sigma_phi 0; 0 sigma_rho];
 mu1 = [theta0; R0];
-mu2 = [wrapToPi(theta0+pi); R0];
+mu2 = [wrapTo2Pi(theta0+pi); R0];
 
 RF1 = zeros(size(phi));
 RF2 = zeros(size(phi));
