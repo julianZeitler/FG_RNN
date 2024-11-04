@@ -12,7 +12,7 @@ for ori=1:params.num_ori
     P = zeros(params.num_scales, size(B1,3), size(B1,4));
     P(1,:,:) = imfilter(squeeze(E(ori,:,:)), params.B.FF.spatial_neighborhood_exc);
     for k=2:params.num_scales
-        P(k,:,:) = imgaussfilt(squeeze(P(1,:,:)), 0.25*params.scale_step^(k-1));
+        P(k,:,:) = imgaussfilt(squeeze(P(1,:,:)), params.B.FB.coarse_scale*params.scale_step^(k-1));
     end
 
     %% B1-Activity

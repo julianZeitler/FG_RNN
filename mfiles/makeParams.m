@@ -51,6 +51,7 @@ params.B.FF.spatial_neighborhood_exc = gaussianFilter2D(20*R1+(1-mod(20*R1,2)), 
 params.B.FF.spatial_neighborhood_inh = gaussianFilter2D(20*R1+(1-mod(20*R1,2)), 20*R1+(1-mod(20*R1,2)), R1*2, R1*2);
 
 params.B.FB.scale = 2;          % lambda
+params.B.FB.coarse_scale = 0.25;
 params.B.FB.offset = 0.5;       % T_offset
 params.B.FB.inhibition = 100;   % gamma
 params.B.FB.spatial_neighborhood = gaussianFilter2D(20*R1+(1-mod(20*R1,2)), 20*R1+(1-mod(20*R1,2)), R1*2, R1*2);
