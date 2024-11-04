@@ -1,8 +1,8 @@
 function [G] = calculateGCellActivities(B1, B2, params)
 % Calculate G-Cells with incoming B1 and B2 activities.
-G = zeros(params.G.num_scales, size(B1, 3), size(B2, 4));
+G = zeros(params.num_scales, size(B1, 3), size(B2, 4));
 
-for k=1:params.G.num_scales
+for k=1:params.num_scales
     for ori=1:params.num_ori
         % collect excitatory B-cell activity from B1 and B2
         if ori==1

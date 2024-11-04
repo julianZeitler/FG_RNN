@@ -8,16 +8,17 @@ dimensions = size(stimulus);
 % stimulus = changingBackground(dimensions(1), dimensions(2), 50);
 % stimulus = verticalBarStimulus(dimensions(1), dimensions(2), 50);
 % stimulus = vaseStimulus(200, 200, 5, 50);
+% stimulus = CStimulus(200,50,10,1);
 
-save = true;
-% save = false;
+% save = true;
+save = false;
 
 % Initialize activities to zero
 
-B1 = zeros(params.G.num_scales, params.num_ori, dimensions(1), dimensions(2));
-B2 = zeros(params.G.num_scales, params.num_ori, dimensions(1), dimensions(2));
+B1 = zeros(params.num_scales, params.num_ori, dimensions(1), dimensions(2));
+B2 = zeros(params.num_scales, params.num_ori, dimensions(1), dimensions(2));
 E = zeros(params.num_ori, dimensions(1), dimensions(2));
-G = zeros(params.G.num_scales, dimensions(1), dimensions(2));
+G = zeros(params.num_scales, dimensions(1), dimensions(2));
 
 % corfresponse contains contrasts, oriensMatrix contains the orientation of
 % contrasts at each spatial location
