@@ -1,5 +1,5 @@
 function [BOS] = getBOS(B1, B2, params, norm)
-%COMBINEBOS Calculate and combine the BOS-Signal
+%getBOS Calculate and combine the BOS-Signal
 %   Inputs:
 %       B1: oxmxn Matrix (o=#oris, mxn=model dimensions)
 %       B2: oxmxn Matrix (o=#oris, mxn=model dimensions)

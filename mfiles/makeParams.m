@@ -2,7 +2,7 @@ function [params] = makeParams()
 
 %% General parameters
 %number of iterations to run the model for
-params.iterations = 10;
+params.iterations = 5;
 
 %ENTER EDGE MAP ORIENTATIONS (DEG) FOR 1ST QUADRANT ONLY INTO ORI
 %   - computations are done on ori and ori + 90 degrees
