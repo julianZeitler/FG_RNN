@@ -12,7 +12,7 @@ function [BOS, edge_map, occ_map, group_map] = runFGSeperation(stimulus, debug, 
 %           S - normalized strength of BOS-Signal
 %           V - 1
 %       edge_map: edge detection results
-%       occ_map: BOS as image
+%       occ_map: BOS as RGB image
 %       group_map: summed G-Cell activities
 
 debug_flag = false;
