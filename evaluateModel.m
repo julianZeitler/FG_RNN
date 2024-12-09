@@ -1,4 +1,4 @@
-groundtruth_path = fullfile('data', 'groundtruth', 'testfg');
+groundtruth_path = fullfile('data', 'groundtruth', 'trainfg');
 image_path = fullfile('data', 'images');
 
 groundtruth_files = dir(fullfile(groundtruth_path, '*.mat'));
@@ -10,7 +10,7 @@ AccF = zeros(length(ids), 1);
 diffS = zeros(length(ids), 1);
 
 for i = 1:length(ids)
-    id = ids(i);
+    id = ids(i); 
 
     % Construct the filename for the image id.jpg. Look in all image
     % directories
@@ -34,7 +34,7 @@ for i = 1:length(ids)
 
     [BOS, edge_map, occ_map, group_map] = runFGSeperation(img);
     BOS_strength = squeeze(BOS(:,:,2));
-    BOS_orientation = squeeze(BOS(:,:,1));
+    BOS_orientation = 2*pi*squeeze(BOS(:,:,1)); % Orientations are between 0 and 1
 
     % Ground Truth
     gt = load(fullfile(groundtruth_path, sprintf('%d.mat', id)));
@@ -71,7 +71,7 @@ for i = 1:length(ids)
     [~,gt_ori] = computeEdge3(gt_combined_edges, gt_combined_edges>0);
     gt_ori = wrapTo2Pi(gt_ori-pi/2);
     
-    [M1,~] = correspondPixels(BOS_strength>0.01, double(gt_ori>0), 0.0075);
+    [M1,~] = correspondPixels(double(BOS_strength>0.01), double(gt_ori>0), 0.0075);
     iResP = find(M1);
     igtP = M1(find(M1));
     iOC = [BOS_orientation(iResP), gt_ori(igtP)];
