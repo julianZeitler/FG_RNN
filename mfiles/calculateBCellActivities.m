@@ -16,9 +16,26 @@ for ori=1:params.num_ori
     end
 
     %% B1-Activity
+    % Calculate FB-Signal
     FB1 = zeros(params.num_scales, size(B1,3), size(B1,4));
     for k=1:params.num_scales
-        FB1(k,:,:) = imfilter(squeeze(G(k,:,:)), params.G.RF{k,ori+8});
+        B_ori = wrapToPi(params.oris(ori)-pi/2);
+        G_oris = wrapToPi(params.oris + pi/2);
+
+        % Determine the relevant orientations. Only oris +- 90° are considered
+        % B_ori is preferred orientation by G-cell
+        ori_mask1 = abs(wrapToPi(G_oris - B_ori+pi))<pi/2; % For oris in params.ori
+        ori_mask2 = ~ori_mask1; % For opposite oris        
+
+        for idx_G_ori = 1:length(G_oris)
+            if ori_mask1(idx_G_ori)
+                weight = -cos(B_ori - G_oris(idx_G_ori));
+                FB1(k,:,:) = squeeze(FB1(k,:,:)) + weight.*imfilter(squeeze(G(k,:,:)), params.G.RF{k, idx_G_ori+8});
+            elseif ori_mask2(idx_G_ori)
+                weight = -cos(B_ori+pi - G_oris(idx_G_ori));
+                FB1(k,:,:) = squeeze(FB1(k,:,:)) + weight.*imfilter(squeeze(G(k,:,:)), params.G.RF{k, idx_G_ori});
+            end
+        end
     end
     for k=1:params.num_scales
         for j=k+1:params.num_scales
@@ -53,9 +70,26 @@ for ori=1:params.num_ori
     end
 
     %% B2-Activity
+    % Calculate FB-Signal
     FB2 = zeros(params.num_scales, size(B2,3), size(B2,4));
     for k=1:params.num_scales
-        FB2(k,:,:) = imfilter(squeeze(G(k,:,:)), params.G.RF{k,ori});
+        B_ori = wrapToPi(params.oris(ori)-pi/2);
+        G_oris = wrapToPi(params.oris + pi/2);
+
+        % Determine the relevant orientations. Only oris +- 90° are considered
+        % B_ori is preferred orientation by G-cell
+        ori_mask1 = abs(wrapToPi(G_oris - B_ori+pi))<pi/2; % For oris in params.ori
+        ori_mask2 = ~ori_mask1; % For opposite oris
+
+        for idx_G_ori = 1:length(G_oris)
+            if ori_mask1(idx_G_ori)
+                weight = -cos(B_ori - G_oris(idx_G_ori));
+                FB2(k,:,:) = squeeze(FB2(k,:,:)) + weight.*imfilter(squeeze(G(k,:,:)), params.G.RF{k, idx_G_ori});
+            elseif ori_mask2(idx_G_ori)
+                weight = -cos(B_ori+pi - G_oris(idx_G_ori));
+                FB2(k,:,:) = squeeze(FB2(k,:,:)) + weight.*imfilter(squeeze(G(k,:,:)), params.G.RF{k, idx_G_ori+8});
+            end
+        end
     end
     for k=1:params.num_scales
         for j=k+1:params.num_scales

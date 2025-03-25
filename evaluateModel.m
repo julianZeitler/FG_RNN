@@ -32,7 +32,7 @@ for i = 1:length(ids)
     img = rgb2gray(imread(image_filename));
     disp(['Loaded image: ', image_filename]);
 
-    [BOS, edge_map, occ_map, group_map] = runFGSeperation(img);
+    [BOS, edge_map, occ_map, group_map] = runFGSeparation(img);
     BOS_strength = squeeze(BOS(:,:,2));
     BOS_orientation = 2*pi*squeeze(BOS(:,:,1)); % Orientations are between 0 and 1
 
