@@ -20,6 +20,7 @@ params.R0 = 2;
 params.G.scale = 0.3;
 params.G.exp_decay = 0.001;
 params.G.inhibition_strength = 2;
+params.G.inhibitory_input_strength = 0.05;
 
 % create RFs (Receptive Fields) for G-cells
 for k = 0:params.num_scales-1
