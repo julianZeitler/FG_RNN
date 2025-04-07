@@ -52,18 +52,22 @@ for ori=1:params.num_ori
         % Normalization
         weights = gaussianFilter1DCircular(params.num_ori, ori, 1);
         weights = max(weights) - weights;
+        borderSupression = zeros(size(B1,3), size(B1,4));
         for i=1:params.num_ori
             if i == 1
                 OriNorm1 = squeeze(B1(k,i,:,:)) * weights(i) + max(weights) * squeeze(B2(k,i,:,:));
             else
                 OriNorm1 = OriNorm1 + squeeze(B1(k,i,:,:)) * weights(i) + max(weights) * squeeze(B2(k,i,:,:));
             end
+            borderSupression = borderSupression + imfilter(squeeze(B1(k,i,:,:)), borderSupressionKernel(20, params.oris(i)));
+            borderSupression = borderSupression + imfilter(squeeze(B2(k,i,:,:)), borderSupressionKernel(20, params.oris(i)+pi));
         end
         Norm1(k,:,:) = params.B.exp_decay + ...
             params.B.FF.inhibition * imfilter(squeeze(E(ori,:,:)), params.B.FF.spatial_neighborhood_inh) + ...
             params.B.FB.inhibition * imfilter(squeeze(B2(k,ori,:,:)), params.B.FB.spatial_neighborhood) + ...
             params.B.saturation * (squeeze(P(k,:,:)).*(1 + squeeze(D1(k,:,:)))) + ...
-            params.B.FF.ori_norm * OriNorm1;
+            params.B.FF.ori_norm * OriNorm1 + ...
+            params.B.FB.border_supression * borderSupression;
         
         % Assign values to output and finalize calculation
         B1Out(k,ori,:,:) = params.B.FF.scale*(squeeze(P(k,:,:)).*(1 + squeeze(D1(k,:,:))))./(squeeze(Norm1(k,:,:)));
@@ -106,18 +110,22 @@ for ori=1:params.num_ori
         % Normalization
         weights = gaussianFilter1DCircular(params.num_ori, ori, 1);
         weights = max(weights) - weights;
+        borderSupression = zeros(size(B2,3), size(B2,4));
         for i=1:params.num_ori
             if i == 1
                 OriNorm2 = squeeze(B2(k,i,:,:)) * weights(i) + max(weights) * squeeze(B1(k,i,:,:));
             else
                 OriNorm2 = OriNorm2 + squeeze(B2(k,i,:,:)) * weights(i) + max(weights) * squeeze(B1(k,i,:,:));
             end
+            borderSupression = borderSupression + imfilter(squeeze(B1(k,i,:,:)), borderSupressionKernel(20, params.oris(i)));
+            borderSupression = borderSupression + imfilter(squeeze(B2(k,i,:,:)), borderSupressionKernel(20, params.oris(i)+pi));
         end
         Norm2(k,:,:) = params.B.exp_decay + ...
             params.B.FF.inhibition * imfilter(squeeze(E(ori,:,:)), params.B.FF.spatial_neighborhood_inh) + ...
             params.B.FB.inhibition * imfilter(squeeze(B1(k,ori,:,:)), params.B.FB.spatial_neighborhood) + ...
             params.B.saturation * (squeeze(P(k,:,:)).*(1 + squeeze(D2(k,:,:)))) + ...
-            params.B.FF.ori_norm * OriNorm2;
+            params.B.FF.ori_norm * OriNorm2 + ...
+            params.B.FB.border_supression * borderSupression;
 
         % Assign values to output and finalize calculation
         B2Out(k,ori,:,:) = params.B.FF.scale*(squeeze(P(k,:,:)).*(1 + squeeze(D2(k,:,:))))./(squeeze(Norm2(k,:,:)));
