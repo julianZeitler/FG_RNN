@@ -25,11 +25,22 @@ for k=1:params.num_scales
             end
         end
     end
-
+    
     G(k,:,:) = G(k,:,:)/params.num_ori;
+    % Dynamically adjust normalization factor
+    % [maxPerRow, rowIndices] = max(squeeze(G(k,:,:)), [], 2);
+    % [maxValue, colIndex] = max(maxPerRow);
+    % rowIndex = rowIndices(colIndex);
+    % 
+    % norm = imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood{1});
+    % maxNormValue = norm(colIndex, rowIndex);
+    % factor = maxValue/maxNormValue;
+    
+    %G(k,:,:) = params.G.scale * squeeze(G(k,:,:))/max(G(k,:,:), [], "all");
     G(k,:,:) = params.G.scale * squeeze(G(k,:,:))./...
         (params.G.exp_decay + ...
-        params.G.inhibition_strength * imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood{k})); % normalize
+        params.G.inhibition_strength * imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood{k}));
+        % params.G.inhibition_strength * factor * norm); % normalize
 end
 end
 

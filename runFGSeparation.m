@@ -57,7 +57,11 @@ end
 
 %% Run Model
 for idx=1:params.iterations % Loop through all iterations
-    [B1, B2] = calculateBCellActivities(E, B1, B2, G, params);
+    if ~debug || idx ~= params.iterations
+        [B1, B2] = calculateBCellActivities(E, B1, B2, G, params, false);
+    else
+        [B1, B2] = calculateBCellActivities(E, B1, B2, G, params, true);
+    end
     G = calculateGCellActivities(B1, B2, params);
 
     if debug_flag
@@ -77,6 +81,12 @@ group_map = squeeze(sum(G));
 
 %% Debug
 if debug_flag
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % FB Segmentation (already generated)
+    if save
+        saveas(gcf, fullfile(log_dir, 'FB_segmentation.png'));
+    end
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % 2D graph for average B activity
     figure;

@@ -1,4 +1,4 @@
-function [B1Out,B2Out] = calculateBCellActivities(E, B1, B2, G, params)
+function [B1Out,B2Out] = calculateBCellActivities(E, B1, B2, G, params, debug)
 % calculateBCellActivities Calculate the activity of B-cells based on E-
 %   and G-cell activities
 %
@@ -33,7 +33,8 @@ for ori=1:params.num_ori
             end
         end
     end
-    FB1 = squeeze(max(FB1, [], 1));
+    [FB1, FB1_idx] = max(FB1, [], 1);
+    FB1 = squeeze(FB1);
 
     % Distal Input (FB)
     D1 = params.B.FB.scale * (2 * ((1./(1+exp(-FB1))) - params.B.FB.offset)); % Distal Input (FB)
@@ -81,7 +82,8 @@ for ori=1:params.num_ori
             end
         end
     end
-    FB2 = squeeze(max(FB2, [], 1));
+    [FB2, FB2_idx] = max(FB2, [], 1);
+    FB2 = squeeze(FB2);
 
     % Distal Input (FB)
     D2 = params.B.FB.scale * (2 * ((1./(1+exp(-FB2))) - params.B.FB.offset)); % Distal Input (FB)
@@ -109,6 +111,52 @@ for ori=1:params.num_ori
     B2Out(ori,:,:) = max(0, B2Out(ori,:,:)); % remove negative values
     B2Out(isnan(B2Out)) = 0;
 
+    %% Debug
+    if debug == true
+        % Compare B1 and B2
+        B1_vs_B2_mask = squeeze(B1Out(ori,:,:) > B2Out(ori,:,:)); % 1 if B1 wins, 0 if B2 wins
+        
+        % Store the best B1 or B2 activity
+        BestActivityAtOri = squeeze(B1Out(ori,:,:));
+        B2Map = squeeze(B2Out(ori,:,:)); % 2D matrix
+        BestActivityAtOri(~B1_vs_B2_mask) = B2Map(~B1_vs_B2_mask);
+        
+        % Store scale indices
+        FB1_idx = squeeze(FB1_idx);
+        FB2_idx = squeeze(FB2_idx);
+        BestScaleIdxAtOri = FB1_idx; % default
+        BestScaleIdxAtOri(~B1_vs_B2_mask) = FB2_idx(~B1_vs_B2_mask);
+        
+        % Save per orientation
+        BestActivity(:,:,:,ori) = BestActivityAtOri;
+        BestScaleIdx(:,:,:,ori) = BestScaleIdxAtOri;
+    end
+end
+
+if debug == true
+    % Find maximum over orientations
+    [~, WinningOri] = max(BestActivity, [], 4); % 4th dimension = orientation
+    
+    % Initialize final map
+    [H, W, ~, ~] = size(BestActivity);
+    FinalWinningScaleIdx = zeros(H, W);
+    
+    % Go through each pixel and select the winning scale
+    for x = 1:H
+        for y = 1:W
+            FinalWinningScaleIdx(x,y) = BestScaleIdx(x,y,1,WinningOri(x,y));
+        end
+    end
+    
+    % Plot
+    figure;
+    imagesc(FinalWinningScaleIdx);
+    axis image;
+    colorbar;
+    colormap(jet(params.num_scales)); % or your preferred map
+    title('Final Winning Scale Index');
+    xlabel('X');
+    ylabel('Y');
 end
 end
 
