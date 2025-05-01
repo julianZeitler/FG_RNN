@@ -18,9 +18,12 @@ params.R0 = 2;
 
 %% G-cell parameters
 params.G.scale = 0.3;
-params.G.exp_decay = 0.001;
-params.G.inhibition_strength = 2;
-params.G.inhibitory_input_strength = 0.2;
+params.G.exp_decay_space = 0.007;
+params.G.inhibition_strength_space = 10;
+
+params.G.exp_decay_scale = 0.5;
+params.G.inhibition_strength_scale = 1;
+
 
 % create RFs (Receptive Fields) for G-cells
 for k = 0:params.num_scales-1
@@ -32,8 +35,8 @@ for k = 0:params.num_scales-1
     params.G.inhibition_neighborhood{k+1} = gaussianFilter2D( ...
         10*params.R0*params.scale_step^(k+1)-mod(10*params.R0*params.scale_step^(k+1),2), ...
         10*params.R0*params.scale_step^(k+1)-mod(10*params.R0*params.scale_step^(k+1),2), ...
-        3*params.R0*params.scale_step^(k+1), ...
-        3*params.R0*params.scale_step^(k+1));
+        5*params.R0*params.scale_step^(k+1), ...
+        5*params.R0*params.scale_step^(k+1));
 end
 
 %% B-cell parameters (FF=FeedForward, FB=FeedBack)

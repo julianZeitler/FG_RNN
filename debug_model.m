@@ -1,5 +1,5 @@
 close all;
-path = 'output/feedback/20250115_Normalization';
+path = 'output/feedback/20250430_Scale_Competition';
 
 stimulus = rgb2gray(imread("images/42049.jpg"));
 runFGSeparation(stimulus, true, fullfile(path, "eagle"));

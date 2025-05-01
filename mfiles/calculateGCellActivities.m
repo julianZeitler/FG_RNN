@@ -1,7 +1,9 @@
 function [G] = calculateGCellActivities(B1, B2, params)
 % Calculate G-Cells with incoming B1 and B2 activities.
-G = zeros(params.num_scales, size(B1, 3), size(B1, 4));
-G_inh_input = zeros(params.num_scales, size(B1,3), size(B1,4));
+
+G = zeros(params.num_scales, size(B1, 2), size(B1, 3));
+G_inh_input = zeros(params.num_scales, size(B1,2), size(B1,3));
+
 for k=1:params.num_scales
     for idx_G_ori = 1:params.num_ori
         G_ori = wrapTo2Pi(params.oris(idx_G_ori) + pi/2);
@@ -39,9 +41,21 @@ for k=1:params.num_scales
 
     G(k,:,:) = G(k,:,:)/params.num_ori;
     G(k,:,:) = params.G.scale * squeeze(G(k,:,:))./(...
-        params.G.exp_decay + ...
-        params.G.inhibition_strength*imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood{k}) + ...
-        params.G.inhibitory_input_strength * squeeze(G_inh_input(k,:,:))); % normalize
+        params.G.exp_decay_space + ...
+        params.G.inhibition_strength_space * imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood{k}) + ...
+        params.G.inhibitory_input_strength * squeeze(G_inh_input(k,:,:)));
+end
+for k=1:params.num_scales
+    inhibition = zeros(size(G, 2), size(G, 3));
+    for i=1:params.num_scales
+        if i == k
+            continue
+        end
+        inhibition = inhibition + imfilter(squeeze(G(i,:,:)), params.G.inhibition_neighborhood{3});
+    end
+    G(k,:,:) = squeeze(G(k,:,:))./...
+        (params.G.exp_decay_scale + ...
+        params.G.inhibition_strength_scale * inhibition);
 end
 end
 
