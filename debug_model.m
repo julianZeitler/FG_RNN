@@ -1,5 +1,5 @@
 close all;
-path = 'output/feedback/20250428_MaxFB_Param_Tuning';
+path = 'output/feedback/20250430_Scale_Competition';
 
 stimulus = rgb2gray(imread("images/42049.jpg"));
 runFGSeparation(stimulus, true, fullfile(path, "eagle"));

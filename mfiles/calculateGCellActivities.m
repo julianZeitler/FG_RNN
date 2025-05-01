@@ -1,6 +1,6 @@
 function [G] = calculateGCellActivities(B1, B2, params)
 % Calculate G-Cells with incoming B1 and B2 activities.
-G = zeros(params.num_scales, size(B1, 2), size(B2, 3));
+G = zeros(params.num_scales, size(B1, 2), size(B1, 3));
 
 for k=1:params.num_scales
     for idx_G_ori = 1:params.num_ori
@@ -27,20 +27,21 @@ for k=1:params.num_scales
     end
     
     G(k,:,:) = G(k,:,:)/params.num_ori;
-    % Dynamically adjust normalization factor
-    % [maxPerRow, rowIndices] = max(squeeze(G(k,:,:)), [], 2);
-    % [maxValue, colIndex] = max(maxPerRow);
-    % rowIndex = rowIndices(colIndex);
-    % 
-    % norm = imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood{1});
-    % maxNormValue = norm(colIndex, rowIndex);
-    % factor = maxValue/maxNormValue;
-    
-    %G(k,:,:) = params.G.scale * squeeze(G(k,:,:))/max(G(k,:,:), [], "all");
     G(k,:,:) = params.G.scale * squeeze(G(k,:,:))./...
-        (params.G.exp_decay + ...
-        params.G.inhibition_strength * imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood{k}));
-        % params.G.inhibition_strength * factor * norm); % normalize
+        (params.G.exp_decay_space + ...
+        params.G.inhibition_strength_space * imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood{k}));
+end
+for k=1:params.num_scales
+    inhibition = zeros(size(G, 2), size(G, 3));
+    for i=1:params.num_scales
+        if i == k
+            continue
+        end
+        inhibition = inhibition + imfilter(squeeze(G(i,:,:)), params.G.inhibition_neighborhood{3});
+    end
+    G(k,:,:) = squeeze(G(k,:,:))./...
+        (params.G.exp_decay_scale + ...
+        params.G.inhibition_strength_scale * inhibition);
 end
 end
 
