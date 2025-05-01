@@ -24,6 +24,7 @@ params.G.inhibition_strength_space = 10;
 params.G.exp_decay_scale = 0.5;
 params.G.inhibition_strength_scale = 1;
 
+
 % create RFs (Receptive Fields) for G-cells
 for k = 0:params.num_scales-1
     GRF = makeGRF(params.R0*params.scale_step^k,oris+pi/2);
@@ -55,6 +56,7 @@ params.B.FB.coarse_scale = 0.25;
 params.B.FB.offset = 0.5;       % T_offset
 params.B.FB.inhibition = 300;   % gamma
 params.B.FB.spatial_neighborhood = gaussianFilter2D(20*R1+(1-mod(20*R1,2)), 20*R1+(1-mod(20*R1,2)), R1*2, R1*2);
+params.B.FB.border_supression = 15;
 
 end
 
