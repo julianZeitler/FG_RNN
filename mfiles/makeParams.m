@@ -18,6 +18,7 @@ params.R0 = 2;
 
 %% G-cell parameters
 params.G.scale = 0.3;
+params.G.inhibitory_input_strength = 0.2;
 params.G.exp_decay_space = 0.007;
 params.G.inhibition_strength_space = 10;
 

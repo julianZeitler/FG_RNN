@@ -43,15 +43,15 @@ for ori=1:params.num_ori
     % Normalization
     weights = gaussianFilter1DCircular(params.num_ori, ori, 1);
     weights = max(weights) - weights;
-    borderSupression = zeros(size(B1,3), size(B1,4));
+    borderSupression = zeros(size(B1,2), size(B1,3));
     for i=1:params.num_ori
         if i == 1
             OriNorm1 = squeeze(B1(i,:,:)) * weights(i) + max(weights) * squeeze(B2(i,:,:));
         else
             OriNorm1 = OriNorm1 + squeeze(B1(i,:,:)) * weights(i) + max(weights) * squeeze(B2(i,:,:));
         end
-        borderSupression = borderSupression + imfilter(squeeze(B1(k,i,:,:)), borderSupressionKernel(20, params.oris(i)));
-        borderSupression = borderSupression + imfilter(squeeze(B2(k,i,:,:)), borderSupressionKernel(20, params.oris(i)+pi));
+        borderSupression = borderSupression + imfilter(squeeze(B1(i,:,:)), borderSupressionKernel(20, params.oris(i)));
+        borderSupression = borderSupression + imfilter(squeeze(B2(i,:,:)), borderSupressionKernel(20, params.oris(i)+pi));
     end
     
     Norm1 = params.B.exp_decay + ...
@@ -98,15 +98,15 @@ for ori=1:params.num_ori
     % Normalization
     weights = gaussianFilter1DCircular(params.num_ori, ori, 1);
     weights = max(weights) - weights;
-    borderSupression = zeros(size(B1,3), size(B1,4));
+    borderSupression = zeros(size(B1,2), size(B1,3));
     for i=1:params.num_ori
         if i == 1
             OriNorm2 = squeeze(B2(i,:,:)) * weights(i) + max(weights) * squeeze(B1(i,:,:));
         else
             OriNorm2 = OriNorm2 + squeeze(B2(i,:,:)) * weights(i) + max(weights) * squeeze(B1(i,:,:));
         end
-        borderSupression = borderSupression + imfilter(squeeze(B1(k,i,:,:)), borderSupressionKernel(20, params.oris(i)+pi));
-        borderSupression = borderSupression + imfilter(squeeze(B2(k,i,:,:)), borderSupressionKernel(20, params.oris(i)));
+        borderSupression = borderSupression + imfilter(squeeze(B1(i,:,:)), borderSupressionKernel(20, params.oris(i)+pi));
+        borderSupression = borderSupression + imfilter(squeeze(B2(i,:,:)), borderSupressionKernel(20, params.oris(i)));
     end
 
     Norm2 = params.B.exp_decay + ...

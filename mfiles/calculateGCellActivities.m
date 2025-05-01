@@ -18,23 +18,23 @@ for k=1:params.num_scales
             if ori_mask1(idx_B_ori)
                 % Excitatory
                 weight_exc = -cos(G_ori - B_oris(idx_B_ori));
-                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B1(k,idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
-                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B2(k,idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
+                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B1(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
+                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B2(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
 
                 % Inhibitory
                 weight_inh = cos(G_ori+pi - B_oris(idx_B_ori));
-                G_inh_input(k,:,:) = squeeze(G_inh_input(k,:,:)) + weight_inh.*imfilter(squeeze(B1(k,idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
-                G_inh_input(k,:,:) = squeeze(G_inh_input(k,:,:)) + weight_inh.*imfilter(squeeze(B2(k,idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
+                G_inh_input(k,:,:) = squeeze(G_inh_input(k,:,:)) + weight_inh.*imfilter(squeeze(B1(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
+                G_inh_input(k,:,:) = squeeze(G_inh_input(k,:,:)) + weight_inh.*imfilter(squeeze(B2(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
             elseif ori_mask2(idx_B_ori)
                 % Excitatory
                 weight_exc = -cos(G_ori+pi - B_oris(idx_B_ori));
-                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B1(k,idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
-                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B2(k,idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
+                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B1(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
+                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B2(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
 
                 % Inhibitory
                 weight_inh = cos(G_ori - B_oris(idx_B_ori));
-                G_inh_input(k,:,:) = squeeze(G_inh_input(k,:,:)) + weight_inh.*imfilter(squeeze(B1(k,idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
-                G_inh_input(k,:,:) = squeeze(G_inh_input(k,:,:)) + weight_inh.*imfilter(squeeze(B2(k,idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
+                G_inh_input(k,:,:) = squeeze(G_inh_input(k,:,:)) + weight_inh.*imfilter(squeeze(B1(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
+                G_inh_input(k,:,:) = squeeze(G_inh_input(k,:,:)) + weight_inh.*imfilter(squeeze(B2(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
             end
         end
     end
