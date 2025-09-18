@@ -1,141 +1,105 @@
 close all;
 
-StrMap = ['#########', newline, ...
-          '#+-----+#', newline, ...
-          '#|#####|#', newline, ...
-          '#|#+---+#', newline, ...
-          '#|#|#####', newline, ...
-          '#|#+---+#', newline, ...
-          '#|#####|#', newline, ...
-          '#+-----+#', newline, ...
-          '#########'];
-
-iterations = 20;
-alphaB = 0.36;
-betaB = 1;
-gammaB = 5;
-zetaB = 1.4;
-lambdaB = 5;
-xiB = 0;
-
-alphaG = 0.2;
-betaG = 1;
-gammaG = 2;
-zetaG = 1;
-
-[G_loc, BV1_loc, BH1_loc, E] = parseStringMap(StrMap);
-BV2_loc = BV1_loc;
-BH2_loc = BH1_loc;
-EV = E.*BV1_loc;
-EH = E.*BH1_loc;
-
-G_inhibition_filter = gaussianFilter2D(5, 5, 1, 1);
-GV1_filter = [0.25, 0, 0; 1, 0, 0; 0.25, 0, 0];
-GV2_filter = [0, 0, 0.25; 0, 0, 1; 0, 0, 0.25];
-GH1_filter = [0, 0, 0; 0, 0, 0; 0.25, 1, 0.25];
-GH2_filter = [0.25, 1, 0.25; 0, 0, 0; 0, 0, 0];
-
-BV1_FB_filter = [0, 0, 0; 0, 0, 1; 0, 0, 0];
-BV2_FB_filter = [0, 0, 0; 1, 0, 0; 0, 0, 0];
-BH1_FB_filter = [0, 1, 0; 0, 0, 0; 0, 0, 0];
-BH2_FB_filter = [0, 0, 0; 0, 0, 0; 0, 1, 0];
-
-G = zeros(size(G_loc));
-BV1_prev = zeros(size(G_loc));
-BV2_prev = zeros(size(G_loc));
-BH1_prev = zeros(size(G_loc));
-BH2_prev = zeros(size(G_loc));
-% BV1_prev = betaB*EV./(...
-%     alphaB + ...
-%     zetaB*EV);
-% BV2_prev = betaB*EV./(...
-%     alphaB + ...
-%     zetaB*EV);
-% 
-% BH1_prev = betaB*EH./(...
-%     alphaB + ...
-%     zetaB*EH);
-% BH2_prev = betaB*EH./(...
-%     alphaB + ...
-%     zetaB*EH);
-
-BV1_history = zeros([size(BV1_prev), iterations+1]);
-BV2_history = zeros([size(BV2_prev), iterations+1]);
-BH1_history = zeros([size(BH1_prev), iterations+1]);
-BH2_history = zeros([size(BH2_prev), iterations+1]);
-G_history    = zeros([size(G), iterations+1]);
-
-BV1_history(:,:,1) = BV1_prev;
-BV2_history(:,:,1) = BV2_prev;
-BH1_history(:,:,1) = BH1_prev;
-BH2_history(:,:,1) = BH2_prev;
-G_history(:,:,1)   = G;
-
-for i = 1:iterations
-    FBV1 = imfilter(G, BV1_FB_filter);
-    FBV2 = imfilter(G, BV2_FB_filter);
-
-    BV1 = betaB*EV.*(1 + lambdaB*FBV1)./(...
-        alphaB + ...
-        gammaB*BV2_prev + ...
-        zetaB*EV.*(1 + lambdaB*FBV1));
-
-    BV2 = betaB*EV.*(1 + lambdaB*FBV2)./(...
-        alphaB + ...
-        gammaB*BV1_prev + ...
-        zetaB*EV.*(1 + lambdaB*FBV2));
-
-    FBH1 = imfilter(G, BH1_FB_filter);
-    FBH2 = imfilter(G, BH2_FB_filter);
-
-    BH1 = betaB*EH.*(1 + lambdaB*FBH1)./(...
-        alphaB + ...
-        gammaB*BH2_prev + ...
-        zetaB*EH.*(1 + lambdaB*FBH1));
-
-    BH2 = betaB*EH.*(1 + lambdaB*FBH2)./(...
-        alphaB + ...
-        gammaB*BH1_prev + ...
-        zetaB*EH.*(1 + lambdaB*FBH2));
-
-    G_in = imfilter(BV1, GV1_filter) + ...
-        imfilter(BV2, GV2_filter) + ...
-        imfilter(BH1, GH1_filter) + ...
-        imfilter(BH2, GH2_filter);
-
-    G = betaG*G_in./( ...
-        alphaG + ...
-        gammaG*imfilter(G, G_inhibition_filter) + ...
-        zetaG*G_in);
-
-    BV1_history(:,:,i+1) = BV1;
-    BV2_history(:,:,i+1) = BV2;
-    BH1_history(:,:,i+1) = BH1;
-    BH2_history(:,:,i+1) = BH2;
-    G_history(:,:,i+1)   = G;
-
-    BV1_prev = BV1;
-    BV2_prev = BV2;
-    BH1_prev = BH1;
-    BH2_prev = BH2;
+savePath = 'G:\Meine Ablage\Studium\Master\Project Modulatory Feedback\FG_RNN\output\feedback\20250918_back_to_2D\Line';
+if ~exist(savePath, 'dir')
+    mkdir(savePath);
 end
 
-BOSV = BV1 - BV2;
-BOSH = BH1 - BH2;
+params.iterations = 50;
+params.oris = deg2rad([0, 90]);
+params.num_ori = length(params.oris);
 
-BOS = BOSH + BOSV;
+params.B.alpha = 0.36;
+params.B.beta = 1;
+params.B.gamma = 7;
+params.B.zeta = 0.7;
+params.B.lambda = 5;
+
+params.G.alpha = 0.25;  
+params.G.beta = 1;
+params.G.gamma = 0;
+params.G.zeta = 0.9;
+params.G.mu = 1; % inhibition from opposing B cells
+params.G.inhibition_filter = gaussianFilter2D(5, 5, 1, 1);
+params.G.RF = makeGRF(1, params.oris+pi/2);
+
+[G_loc, BV_loc, BH_loc, E_loc] = parseStringMap(getStringMap(5));
+
+B_loc = zeros(params.num_ori, size(BH_loc, 1), size(BH_loc, 2));
+B_loc(1, :, :) = BH_loc;
+B_loc(2, :, :) = BV_loc;
+E = zeros(params.num_ori, size(BH_loc, 1), size(BH_loc, 2));
+E(1, :, :) = E_loc.*squeeze(B_loc(1, :, :));
+E(2, :, :) = E_loc.*squeeze(B_loc(2, :, :));
+
+G = zeros(size(G_loc));
+B1 = zeros(size(B_loc));
+B2 = zeros(size(B_loc));
+
+B1_prev = B1;
+B2_prev = B2;
+B1_history = zeros([size(B1_prev), params.iterations+1]);
+B2_history = zeros([size(B2_prev), params.iterations+1]);
+G_history = zeros([size(G), params.iterations+1]);
+
+B1_history(:,:,:,1) = B1_prev;
+B2_history(:,:,:,1) = B2_prev;
+G_history(:,:,1) = G;
+
+BOS_over_iterations = zeros([size(G), 3, params.iterations]);
+
+for i = 1:params.iterations
+    for ori = 1:params.num_ori
+        FB1 = imfilter(G, params.G.RF{ori+params.num_ori});
+        B1(ori, :, :) = params.B.beta*squeeze(E(ori,:,:)).*(1 + params.B.lambda*FB1)./(...
+            params.B.alpha + ...
+            params.B.gamma*squeeze(B2_prev(ori,:,:)) + ...
+            params.B.zeta*squeeze(E(ori,:,:)).*(1 + params.B.lambda*FB1));
 
 
-figure; imagesc(E); axis image; colorbar;
-figure; imagesc(BV1_loc); axis image;
-figure; imagesc(BH1_loc); axis image;
-figure; imagesc(G_loc); axis image;
-figure; imagesc(BOS); axis image; colorbar;
+        FB2 = imfilter(G, params.G.RF{ori});
+        B2(ori, :, :) = params.B.beta*squeeze(E(ori,:,:)).*(1 + params.B.lambda*FB2)./(...
+            params.B.alpha + ...
+            params.B.gamma*squeeze(B1_prev(ori,:,:)) + ...
+            params.B.zeta*squeeze(E(ori,:,:)).*(1 + params.B.lambda*FB2));
+    end
+    G_in = zeros(size(G));
+    G_in_inh = zeros(size(G));
+    for ori = 1:params.num_ori
+        G_in = G_in + imfilter(squeeze(B1(ori,:,:)), params.G.RF{ori});
+        G_in = G_in + imfilter(squeeze(B2(ori,:,:)), params.G.RF{ori+params.num_ori});
+
+        G_in_inh = G_in_inh + imfilter(squeeze(B1(ori,:,:)), params.G.RF{ori+params.num_ori});
+        G_in_inh = G_in_inh + imfilter(squeeze(B2(ori,:,:)), params.G.RF{ori});
+    end
+    G = params.G.beta*G_in./( ...
+        params.G.alpha + ...
+        params.G.gamma*imfilter(G, params.G.inhibition_filter) + ...
+        params.G.zeta*G_in + ...
+        params.G.mu*G_in_inh);
+
+    B1_history(:,:,:,i+1) = B1;
+    B2_history(:,:,:,i+1) = B2;
+    G_history(:,:,i+1)   = G;
+
+    B1_prev = B1;
+    B2_prev = B2;
+
+    BOS_over_iterations(:,:,:,i) = getBOS(B1, B2, params, "unnormalized");
+end
 
 
-horizontal_locations = [2,5; 8,5; 4,5; 4,6; 4,7];
-vertical_locations = [5,2; 5,4];
-g_locations = [3,5; 5,5; 7,5; 5,3];  % <-- Define G locations as needed
+% figure; imagesc(E); axis image; colorbar;
+% figure; imagesc(BV1_loc); axis image;
+% figure; imagesc(BH1_loc); axis image;
+% figure; imagesc(G_loc); axis image;
+figure; imagesc(hsv2rgb(getBOS(B1, B2, params))); axis image;
+saveas(gcf, fullfile(savePath, 'BOS.png'));
+
+
+horizontal_locations = [2,2; 2,4; 2,6; 2,8; 2,16];
+vertical_locations = [1,1;];
+g_locations = [1,2; 1,4; 1,8; 1,16];
 
 numVLocations = size(vertical_locations, 1);
 numHLocations = size(horizontal_locations, 1);
@@ -145,26 +109,28 @@ maxPerRow = 5;
 numVRows = ceil(numVLocations / maxPerRow);
 numHRows = ceil(numHLocations / maxPerRow);
 numGRows = ceil(numGLocations / maxPerRow);
-iterations_axis = 1:iterations+1;
+iterations_axis = 1:params.iterations+1;
 
 %% --- Vertical B Cells ---
-figure;
+figure('Position', [100, 100, 1200, 600]);
 for idx = 1:numVLocations
     row = vertical_locations(idx, 1);
     col = vertical_locations(idx, 2);
 
-    BV1_trace = squeeze(BV1_history(row, col, :));
-    BV2_trace = squeeze(BV2_history(row, col, :));
+    BV1_trace = squeeze(B1_history(2, row, col, :));
+    BV2_trace = squeeze(B2_history(2, row, col, :));
 
     subplot(numVRows, min(maxPerRow, numVLocations), idx);
     plot(iterations_axis, BV1_trace, 'b-', 'LineWidth', 1.5); hold on;
-    plot(iterations_axis, BV2_trace, 'r--', 'LineWidth', 1.5);
+    plot(iterations_axis, BV2_trace, 'r-', 'LineWidth', 1.5);
     title(sprintf('Vertical (%d, %d)', row, col));
     xlabel('Iter'); ylabel('Act.');
     legend('BV1','BV2','Location','southeast');
     grid on;
 end
 sgtitle('Vertical B Cell Activity Over Iterations');
+set(gcf, "Position", [100, 100, 1200, 300*numVRows]);
+saveas(gcf, fullfile(savePath, 'Vertical B Cells.png'));
 
 %% --- Horizontal B Cells ---
 figure;
@@ -172,18 +138,20 @@ for idx = 1:numHLocations
     row = horizontal_locations(idx, 1);
     col = horizontal_locations(idx, 2);
 
-    BH1_trace = squeeze(BH1_history(row, col, :));
-    BH2_trace = squeeze(BH2_history(row, col, :));
+    BH1_trace = squeeze(B1_history(1, row, col, :));
+    BH2_trace = squeeze(B2_history(1, row, col, :));
 
     subplot(numHRows, min(maxPerRow, numHLocations), idx);
     plot(iterations_axis, BH1_trace, 'b-', 'LineWidth', 1.5); hold on;
-    plot(iterations_axis, BH2_trace, 'r--', 'LineWidth', 1.5);
+    plot(iterations_axis, BH2_trace, 'r-', 'LineWidth', 1.5);
     title(sprintf('Horizontal (%d, %d)', row, col));
     xlabel('Iter'); ylabel('Act.');
     legend('BH1','BH2','Location','southeast');
     grid on;
 end
 sgtitle('Horizontal B Cell Activity Over Iterations');
+set(gcf, "Position", [100, 100, 1200, 300*numHRows]);
+saveas(gcf, fullfile(savePath, 'Horizontal B Cells.png'));
 
 %% --- G Cells ---
 figure;
@@ -201,3 +169,20 @@ for idx = 1:numGLocations
     grid on;
 end
 sgtitle('G Cell Activity Over Iterations');
+set(gcf, "Position", [100, 100, 1200, 300*numGRows]);
+saveas(gcf, fullfile(savePath, 'G Cells.png'));
+
+%% BOS over iterations
+BOS_over_iterations(:,:,:,2) = BOS_over_iterations(:,:,:,2)/max(BOS_over_iterations(:,:,:,2), [], "all");
+figure('Position', [100, 100, 1500, 300]);
+selected_iterations = round(linspace(1, params.iterations, 5));
+for idx = 1:5
+    iter = selected_iterations(idx);
+    subplot(1, 5, idx);
+    imagesc(hsv2rgb(BOS_over_iterations(:,:,:,iter))); 
+    axis image;
+    title(sprintf('Iteration %d', iter));
+    axis off;
+end
+sgtitle('BOS Evolution Over Iterations');
+saveas(gcf, fullfile(savePath, 'BOS_over_iterations.png'));
