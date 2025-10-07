@@ -1,9 +1,10 @@
-function GRF = makeGRF(R0, oris)
+function GRF = makeGRF(R0, oris, type)
 %MAKEGRF Create RFs for G-cells
 %   inputs:
 %       R0: radius (mean of gaussian)
 %       oris: orientations (only provide interval [0,pi), the rest is
 %       inferred)
+%       mode: "donut" or "gauss"
 %
 %   out:
 %       RF: filter masks
@@ -12,7 +13,13 @@ function GRF = makeGRF(R0, oris)
 [phi, rho] = cart2pol(X, Y);
 phi(ceil(size(phi, 1)/2), ceil(size(phi, 2)/2)) = NaN;
 
-values = normpdf(rho,R0,R0/3);
+if type == "donut"
+    values = normpdf(rho,R0,R0/3);
+elseif type == "gauss"
+    values = normpdf(rho,0,R0);
+else
+    error("Select either 'donut' or 'gauss' as mode.");
+end
 
 for ori=1:length(oris)
     angle_mask_1 = abs(wrapToPi(phi-oris(ori)))<=pi/(length(oris)*2);
