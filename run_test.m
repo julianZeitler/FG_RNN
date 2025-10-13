@@ -175,3 +175,13 @@ close all;
 stimulus = overlappingRectangles(256, 256, 192, 192, 64, 64);
 runFGSeparation(stimulus, params, true, fullfile(path, "overlap big C"));
 close all;
+
+
+
+params = makeParams("filter_type","gauss", "num_scales",3, "G_nu",0.3);
+runFGSeparation(stimulus, params, true, fullfile("output/feedback/20251008_scale_compensation/gauss/attention_1/C"));
+close all;
+
+params = makeParams("filter_type","donut", "num_scales",3, "G_nu",0.3);
+runFGSeparation(stimulus, params, true, fullfile("output/feedback/20251008_scale_compensation/donut/attention_1/C"));
+close all;

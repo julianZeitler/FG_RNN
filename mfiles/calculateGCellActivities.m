@@ -1,5 +1,9 @@
-function [G] = calculateGCellActivities(B1, B2, params)
+function [G] = calculateGCellActivities(B1, B2, params, attention)
 % Calculate G-Cells with incoming B1 and B2 activities.
+
+if nargin < 4
+    attention = zeros(1, params.num_scales);
+end
 
 G = zeros(params.num_scales, size(B1, 2), size(B1, 3));
 G_exc_input = zeros(params.num_scales, size(B1,2), size(B1,3));
@@ -51,12 +55,19 @@ for k=1:params.num_scales
         end
         scale_inhibition = scale_inhibition + squeeze(G_exc_input(l,:,:)); %imfilter(squeeze(G_exc_input(l,:,:)), params.G.inhibition_neighborhood{1});
     end
-    G(k,:,:) = params.G.beta * squeeze(G_exc_input(k,:,:))./(...
+    G(k,:,:) = params.G.beta * squeeze(G_exc_input(k,:,:))*(1+attention(k))./(...
         params.G.alpha + ...
         params.G.gamma * imfilter(squeeze(G_exc_input(k,:,:)), params.G.inhibition_neighborhood{k}) + ...
         params.G.zeta * squeeze(G_exc_input(k,:,:)) + ...
         params.G.mu * squeeze(G_inh_input(k,:,:)) + ...
         params.G.nu * scale_inhibition);
+    if k==2
+        % G(k,:,:) = 1.2*1.47*G(k,:,:);
+        G(k,:,:) = 1.2*1.32*G(k,:,:);
+    elseif k==3
+        % G(k,:,:) = 1.2*2.02*G(k,:,:);
+        G(k,:,:) = 1.2*2.30*G(k,:,:);
+    end
 end
 end
 

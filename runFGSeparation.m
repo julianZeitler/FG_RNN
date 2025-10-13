@@ -62,7 +62,7 @@ for idx=1:params.iterations % Loop through all iterations
     else
         [B1, B2] = calculateBCellActivities(E, B1, B2, G, params, true);
     end
-    G = calculateGCellActivities(B1, B2, params);
+    G = calculateGCellActivities(B1, B2, params, [0, 1, 0]);
 
     if debug_flag
         % Average B1 and B2 over orientations and the entire array (calculate one scalar)
