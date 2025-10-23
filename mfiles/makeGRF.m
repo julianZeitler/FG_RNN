@@ -11,7 +11,6 @@ function GRF = makeGRF(R0, oris, type)
 
 [X, Y] = meshgrid(round(-2*R0):round(2*R0), round(2*R0):-1:round(-2*R0));
 [phi, rho] = cart2pol(X, Y);
-phi(ceil(size(phi, 1)/2), ceil(size(phi, 2)/2)) = NaN;
 
 if type == "donut"
     values = normpdf(rho,R0,R0/3);
@@ -22,10 +21,11 @@ else
 end
 
 for ori=1:length(oris)
-    angle_mask_1 = abs(wrapToPi(phi-oris(ori)))<=pi/(length(oris)*2);
-    angle_mask_2 = abs(wrapToPi(phi-oris(ori)+pi))-0.0001<=pi/(length(oris)*2);
-    GRF{ori} = values.*angle_mask_1./sum(values.*angle_mask_1, "all");
-    GRF{ori+length(oris)} = values.*angle_mask_2./sum(values.*angle_mask_2, "all");
+    sigma2 = pi/(length(oris))^2;
+    radial_gauss1 = 1/sqrt(2*pi*sigma2)*exp(-1/2*wrapToPi((phi-oris(ori))).^2/sigma2);
+    radial_gauss2 = 1/sqrt(2*pi*sigma2)*exp(-1/2*wrapToPi((phi-oris(ori)+pi)).^2/sigma2);
+    GRF{ori} = values.*radial_gauss1./sum(values.*radial_gauss1, "all");
+    GRF{ori+length(oris)} = values.*radial_gauss2./sum(values.*radial_gauss2, "all");
 end
 end
 
