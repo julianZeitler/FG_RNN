@@ -61,13 +61,6 @@ for k=1:params.num_scales
         params.G.zeta * squeeze(G_exc_input(k,:,:)) + ...
         params.G.mu * squeeze(G_inh_input(k,:,:)) + ...
         params.G.nu * scale_inhibition);
-    if k==2
-        % G(k,:,:) = 1.2*1.47*G(k,:,:);
-        G(k,:,:) = 1.2*1.32*G(k,:,:);
-    elseif k==3
-        % G(k,:,:) = 1.2*2.02*G(k,:,:);
-        G(k,:,:) = 1.2*2.30*G(k,:,:);
-    end
 end
 end
 
