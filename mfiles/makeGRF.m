@@ -21,9 +21,14 @@ else
 end
 
 for ori=1:length(oris)
-    sigma2 = pi/(length(oris))^2;
-    radial_gauss1 = 1/sqrt(2*pi*sigma2)*exp(-1/2*wrapToPi((phi-oris(ori))).^2/sigma2);
-    radial_gauss2 = 1/sqrt(2*pi*sigma2)*exp(-1/2*wrapToPi((phi-oris(ori)+pi)).^2/sigma2);
+    sigma = pi/(length(oris));
+    sigma2 = sigma^2;
+    % Mask everything further than 2*sigma for performance improvement
+    angle_mask_1 = abs(wrapToPi(phi-oris(ori)))<=2*sigma;
+    angle_mask_2 = abs(wrapToPi(phi-oris(ori)+pi))-0.0001<=2*sigma;
+
+    radial_gauss1 = 1/sqrt(2*pi*sigma2)*exp(-1/2*wrapToPi((phi-oris(ori))).^2/sigma2).*angle_mask_1;
+    radial_gauss2 = 1/sqrt(2*pi*sigma2)*exp(-1/2*wrapToPi((phi-oris(ori)+pi)).^2/sigma2).*angle_mask_2;
     GRF{ori} = values.*radial_gauss1./sum(values.*radial_gauss1, "all");
     GRF{ori+length(oris)} = values.*radial_gauss2./sum(values.*radial_gauss2, "all");
 end
