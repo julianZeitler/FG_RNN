@@ -60,6 +60,7 @@ E_norm = imfilter(squeeze(sum(E, 1)), gaussianFilter2D(15, 15, 5, 5));
 for ori=1:params.num_ori
     E(ori, :, :) = squeeze(E(ori, :, :))./(0.01 + 5*E_norm);
 end
+E = E*params.E_scale;
 
 if options.debug
     % Initialize arrays to store average B activities and BOS-Signals

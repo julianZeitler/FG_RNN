@@ -20,6 +20,7 @@ function [params] = makeParams(options)
         options.B_mu = 0
         options.B_nu = 0
         options.B_integration_mode {mustBeMember(options.B_integration_mode, ["sum", "max"])} = "sum"
+        options.E_scale = 1
     end
 
     %% General parameters
@@ -31,6 +32,7 @@ function [params] = makeParams(options)
     params.scale_step = options.scale_step;
     params.R0 = options.R0;
     params.filter_type = options.filter_type;
+    params.E_scale = options.E_scale;
 
     %% G-cell parameters
     params.G.alpha = options.G_alpha; % exp decay
