@@ -1,7 +1,12 @@
-function [G] = calculateGCellActivities(B1, B2, params)
+function [G] = calculateGCellActivities(B1, B2, params, attention)
 % Calculate G-Cells with incoming B1 and B2 activities.
 
+if nargin < 4
+    attention = zeros(1, params.num_scales);
+end
+
 G = zeros(params.num_scales, size(B1, 2), size(B1, 3));
+G_exc_input = zeros(params.num_scales, size(B1,2), size(B1,3));
 G_inh_input = zeros(params.num_scales, size(B1,2), size(B1,3));
 
 for k=1:params.num_scales
@@ -18,8 +23,8 @@ for k=1:params.num_scales
             if ori_mask1(idx_B_ori)
                 % Excitatory
                 weight_exc = -cos(G_ori - B_oris(idx_B_ori));
-                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B1(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
-                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B2(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
+                G_exc_input(k,:,:) = squeeze(G_exc_input(k,:,:)) + weight_exc.*imfilter(squeeze(B1(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
+                G_exc_input(k,:,:) = squeeze(G_exc_input(k,:,:)) + weight_exc.*imfilter(squeeze(B2(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
 
                 % Inhibitory
                 weight_inh = cos(G_ori+pi - B_oris(idx_B_ori));
@@ -28,8 +33,8 @@ for k=1:params.num_scales
             elseif ori_mask2(idx_B_ori)
                 % Excitatory
                 weight_exc = -cos(G_ori+pi - B_oris(idx_B_ori));
-                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B1(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
-                G(k,:,:) = squeeze(G(k,:,:)) + weight_exc.*imfilter(squeeze(B2(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
+                G_exc_input(k,:,:) = squeeze(G_exc_input(k,:,:)) + weight_exc.*imfilter(squeeze(B1(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori+8});
+                G_exc_input(k,:,:) = squeeze(G_exc_input(k,:,:)) + weight_exc.*imfilter(squeeze(B2(idx_B_ori,:,:)), params.G.RF{k, idx_G_ori});
 
                 % Inhibitory
                 weight_inh = cos(G_ori - B_oris(idx_B_ori));
@@ -38,24 +43,24 @@ for k=1:params.num_scales
             end
         end
     end
-
-    G(k,:,:) = G(k,:,:)/params.num_ori;
-    G(k,:,:) = params.G.scale * squeeze(G(k,:,:))./(...
-        params.G.exp_decay_space + ...
-        params.G.inhibition_strength_space * imfilter(squeeze(G(k,:,:)), params.G.inhibition_neighborhood{k}) + ...
-        params.G.inhibitory_input_strength * squeeze(G_inh_input(k,:,:)));
+    G_exc_input(k,:,:) = G_exc_input(k,:,:)/params.num_ori;
+    G_inh_input(k,:,:) = G_inh_input(k,:,:)/params.num_ori;
 end
+
 for k=1:params.num_scales
-    inhibition = zeros(size(G, 2), size(G, 3));
-    for i=1:params.num_scales
-        if i == k
+    scale_inhibition = zeros(size(G, 2), size(G, 3));
+    for l=1:params.num_scales
+        if l == k
             continue
         end
-        inhibition = inhibition + imfilter(squeeze(G(i,:,:)), params.G.inhibition_neighborhood{3});
+        scale_inhibition = scale_inhibition + squeeze(G_exc_input(l,:,:)); %imfilter(squeeze(G_exc_input(l,:,:)), params.G.inhibition_neighborhood{1});
     end
-    G(k,:,:) = squeeze(G(k,:,:))./...
-        (params.G.exp_decay_scale + ...
-        params.G.inhibition_strength_scale * inhibition);
+    G(k,:,:) = params.G.beta * squeeze(G_exc_input(k,:,:))*(1+attention(k))./(...
+        params.G.alpha + ...
+        params.G.gamma * imfilter(squeeze(G_exc_input(k,:,:)), params.G.inhibition_neighborhood{k}) + ...
+        params.G.zeta * squeeze(G_exc_input(k,:,:)) + ...
+        params.G.mu * squeeze(G_inh_input(k,:,:)) + ...
+        params.G.nu * scale_inhibition);
 end
 end
 

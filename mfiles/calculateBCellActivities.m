@@ -26,7 +26,7 @@ for ori=1:params.num_ori
         for idx_G_ori = 1:length(G_oris)
             if ori_mask1(idx_G_ori)
                 weight = -cos(B_ori - G_oris(idx_G_ori));
-                FB1(k,:,:) = squeeze(FB1(k,:,:)) + weight.*imfilter(squeeze(G(k,:,:)), params.G.RF{k, idx_G_ori+8});
+                FB1(k,:,:) = squeeze(FB1(k,:,:)) + weight.*imfilter(squeeze(G(k,:,:)), params.G.RF{k, idx_G_ori+params.num_ori});
             elseif ori_mask2(idx_G_ori)
                 weight = -cos(B_ori+pi - G_oris(idx_G_ori));
                 FB1(k,:,:) = squeeze(FB1(k,:,:)) + weight.*imfilter(squeeze(G(k,:,:)), params.G.RF{k, idx_G_ori});
@@ -34,11 +34,17 @@ for ori=1:params.num_ori
         end
     end
     
-    [FB1, FB1_idx] = max(FB1, [], 1);
-    FB1 = squeeze(FB1);
+    if params.B.integration_mode == "max"
+        [FB1, FB1_idx] = max(FB1, [], 1);
+        FB1 = squeeze(FB1);
+    elseif params.B.integration_mode == "sum"
+        FB1 = squeeze(sum(FB1, 1));
+    else
+        error("Select either 'max' or 'sum' as integration modes.");
+    end
 
     % Distal Input (FB)
-    D1 = params.B.FB.scale * (2 * ((1./(1+exp(-FB1))) - params.B.FB.offset)); % Distal Input (FB)
+    D1 = params.B.lambda * (2 * ((1./(1+exp(-FB1))) - 0.5)); % Distal Input (FB)
 
     % Normalization
     weights = gaussianFilter1DCircular(params.num_ori, ori, 1);
@@ -46,23 +52,22 @@ for ori=1:params.num_ori
     borderSupression = zeros(size(B1,2), size(B1,3));
     for i=1:params.num_ori
         if i == 1
-            OriNorm1 = squeeze(B1(i,:,:)) * weights(i) + max(weights) * squeeze(B2(i,:,:));
+            oriCompetition1 = squeeze(B1(i,:,:)) * weights(i) + max(weights) * squeeze(B2(i,:,:));
         else
-            OriNorm1 = OriNorm1 + squeeze(B1(i,:,:)) * weights(i) + max(weights) * squeeze(B2(i,:,:));
+            oriCompetition1 = oriCompetition1 + squeeze(B1(i,:,:)) * weights(i) + max(weights) * squeeze(B2(i,:,:));
         end
         borderSupression = borderSupression + imfilter(squeeze(B1(i,:,:)), borderSupressionKernel(20, params.oris(i)));
         borderSupression = borderSupression + imfilter(squeeze(B2(i,:,:)), borderSupressionKernel(20, params.oris(i)+pi));
     end
-    
-    Norm1 = params.B.exp_decay + ...
-        params.B.FF.inhibition * imfilter(squeeze(E(ori,:,:)), params.B.FF.spatial_neighborhood_inh) + ...
-        params.B.FB.inhibition * imfilter(squeeze(B2(ori,:,:)), params.B.FB.spatial_neighborhood) + ...
-        params.B.saturation * (P.*(1 + D1)) + ...
-        params.B.FF.ori_norm * OriNorm1 + ...
-        params.B.FB.border_supression * borderSupression;
+
+    Norm1 = params.B.alpha + ...
+        params.B.gamma * imfilter(squeeze(B2(ori,:,:)), params.B.FB.spatial_neighborhood) + ...
+        params.B.zeta * (P.*(1 + D1)) + ...
+        params.B.mu * oriCompetition1 + ...
+        params.B.nu * borderSupression;
     
     % Assign values to output and finalize calculation
-    B1Out(ori,:,:) = params.B.FF.scale*(P.*(1 + D1))./Norm1;
+    B1Out(ori,:,:) = params.B.beta*(P.*(1 + D1))./Norm1;
     B1Out(ori,:,:) = max(0, B1Out(ori,:,:)); % remove negative values
     B1Out(isnan(B1Out)) = 0;
 
@@ -84,45 +89,49 @@ for ori=1:params.num_ori
                 FB2(k,:,:) = squeeze(FB2(k,:,:)) + weight.*imfilter(squeeze(G(k,:,:)), params.G.RF{k, idx_G_ori});
             elseif ori_mask2(idx_G_ori)
                 weight = -cos(B_ori+pi - G_oris(idx_G_ori));
-                FB2(k,:,:) = squeeze(FB2(k,:,:)) + weight.*imfilter(squeeze(G(k,:,:)), params.G.RF{k, idx_G_ori+8});
+                FB2(k,:,:) = squeeze(FB2(k,:,:)) + weight.*imfilter(squeeze(G(k,:,:)), params.G.RF{k, idx_G_ori+params.num_ori});
             end
         end
     end
     
-    [FB2, FB2_idx] = max(FB2, [], 1);
-    FB2 = squeeze(FB2);
+    if params.B.integration_mode == "max"
+        [FB2, FB2_idx] = max(FB2, [], 1);
+        FB2 = squeeze(FB2);
+    elseif params.B.integration_mode == "sum"
+        FB2 = squeeze(sum(FB2, 1));
+    else
+        error("Select either 'max' or 'sum' as integration modes.");
+    end
 
     % Distal Input (FB)
-    D2 = params.B.FB.scale * (2 * ((1./(1+exp(-FB2))) - params.B.FB.offset)); % Distal Input (FB)
+    D2 = params.B.lambda * (2 * ((1./(1+exp(-FB2))) - 0.5)); % Distal Input (FB)
 
     % Normalization
     weights = gaussianFilter1DCircular(params.num_ori, ori, 1);
     weights = max(weights) - weights;
-    borderSupression = zeros(size(B1,2), size(B1,3));
+    borderSupression = zeros(size(B2,2), size(B2,3));
     for i=1:params.num_ori
         if i == 1
-            OriNorm2 = squeeze(B2(i,:,:)) * weights(i) + max(weights) * squeeze(B1(i,:,:));
+            oriCompetition2 = squeeze(B2(i,:,:)) * weights(i) + max(weights) * squeeze(B1(i,:,:));
         else
-            OriNorm2 = OriNorm2 + squeeze(B2(i,:,:)) * weights(i) + max(weights) * squeeze(B1(i,:,:));
+            oriCompetition2 = oriCompetition2 + squeeze(B2(i,:,:)) * weights(i) + max(weights) * squeeze(B1(i,:,:));
         end
         borderSupression = borderSupression + imfilter(squeeze(B1(i,:,:)), borderSupressionKernel(20, params.oris(i)+pi));
         borderSupression = borderSupression + imfilter(squeeze(B2(i,:,:)), borderSupressionKernel(20, params.oris(i)));
     end
-
-    Norm2 = params.B.exp_decay + ...
-        params.B.FF.inhibition * imfilter(squeeze(E(ori,:,:)), params.B.FF.spatial_neighborhood_inh) + ...
-        params.B.FB.inhibition * imfilter(squeeze(B1(ori,:,:)), params.B.FB.spatial_neighborhood) + ...
-        params.B.saturation * (P.*(1 + D2)) + ...
-        params.B.FF.ori_norm * OriNorm2 + ...
-        params.B.FB.border_supression * borderSupression;
+    Norm2 = params.B.alpha + ...
+        params.B.gamma * imfilter(squeeze(B1(ori,:,:)), params.B.FB.spatial_neighborhood) + ...
+        params.B.zeta * (P.*(1 + D2)) + ...
+        params.B.mu * oriCompetition2 + ...
+        params.B.nu * borderSupression;
 
     % Assign values to output and finalize calculation
-    B2Out(ori,:,:) = params.B.FF.scale*(P.*(1 + D2))./Norm2;
+    B2Out(ori,:,:) = params.B.beta*(P.*(1 + D2))./Norm2;
     B2Out(ori,:,:) = max(0, B2Out(ori,:,:)); % remove negative values
     B2Out(isnan(B2Out)) = 0;
 
     %% Debug
-    if debug == true
+    if debug == true && params.B.integration_mode == "max"
         % Compare B1 and B2
         B1_vs_B2_mask = squeeze(B1Out(ori,:,:) > B2Out(ori,:,:)); % 1 if B1 wins, 0 if B2 wins
         
@@ -143,7 +152,7 @@ for ori=1:params.num_ori
     end
 end
 
-if debug == true
+if debug == true && params.B.integration_mode == "max"
     % Find maximum over orientations
     [~, WinningOri] = max(BestActivity, [], 4); % 4th dimension = orientation
     
@@ -163,7 +172,7 @@ if debug == true
     imagesc(FinalWinningScaleIdx);
     axis image;
     colorbar;
-    colormap(jet(params.num_scales)); % or your preferred map
+    colormap(jet(params.num_scales));
     title('Final Winning Scale Index');
     xlabel('X');
     ylabel('Y');
