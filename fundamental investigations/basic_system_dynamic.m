@@ -1,5 +1,5 @@
-path = 'output/feedback/20250730_Switching_Characteristics/0D';
-
+% path = 'output/feedback/20250730_Switching_Characteristics/0D';
+close all;
 iterations = 200;
 alphaB = 0.36;
 betaB = 1;
@@ -36,8 +36,8 @@ for i = 1:iterations
     end
     
     % Time-dependent biases
-    GLBias = 0.055 - 0.03*exp(-0.1 * i);
-    GRBias = 0.045 + 0.03* exp(-0.1 * i);
+    GLBias = 0.07 - 0.03*exp(-0.1 * i);
+    GRBias = 0.03 + 0.03* exp(-0.1 * i);
     
     BL_prev = BL;
     BR_prev = BR;
@@ -126,6 +126,6 @@ annotation(gcf, 'textbox', [0.01, 0.85, 0.2, 0.1], ...
            'FontSize', 10);
 
 filename = 'time_dependent_BL_BR.png';
-saveas(gcf, fullfile(path, filename));
+% saveas(gcf, fullfile(path, filename));
 
-close all;
+% close all;
