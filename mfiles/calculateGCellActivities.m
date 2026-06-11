@@ -1,8 +1,10 @@
-function [G] = calculateGCellActivities(B1, B2, params, attention)
+function [G] = calculateGCellActivities(B1, B2, params, attention, bias)
 % Calculate G-Cells with incoming B1 and B2 activities.
 
 if nargin < 4
     attention = zeros(1, params.num_scales);
+elseif nargin < 5
+    bias = zeros(size(B1, 2), size(B1, 3));
 end
 
 G = zeros(params.num_scales, size(B1, 2), size(B1, 3));
@@ -55,7 +57,7 @@ for k=1:params.num_scales
         end
         scale_inhibition = scale_inhibition + squeeze(G_exc_input(l,:,:)); %imfilter(squeeze(G_exc_input(l,:,:)), params.G.inhibition_neighborhood{1});
     end
-    G(k,:,:) = params.G.beta * squeeze(G_exc_input(k,:,:))*(1+attention(k))./(...
+    G(k,:,:) = params.G.beta * squeeze(G_exc_input(k,:,:)).*(1+attention(k)+bias)./(...
         params.G.alpha + ...
         params.G.gamma * imfilter(squeeze(G_exc_input(k,:,:)), params.G.inhibition_neighborhood{k}) + ...
         params.G.zeta * squeeze(G_exc_input(k,:,:)) + ...

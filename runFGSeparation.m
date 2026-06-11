@@ -76,7 +76,18 @@ for idx=1:params.iterations % Loop through all iterations
     else
         [B1, B2] = calculateBCellActivities(E, B1, B2, G, params, true);
     end
-    G = calculateGCellActivities(B1, B2, params, options.attention);
+    
+    % if idx >= 90
+    %     G = calculateGCellActivities(B1, B2, params, options.attention, CBias1(800, 600, 600, 360, 120, 1));
+    % elseif idx >= 80
+    %     G = calculateGCellActivities(B1, B2, params, options.attention, CBias1(800, 600, 600, 360, 120, 1));
+    % elseif idx >= 70
+    %     G = calculateGCellActivities(B1, B2, params, options.attention, CBias1(800, 600, 600, 360, 120, 1));
+    % elseif idx >= 60
+    %     G = calculateGCellActivities(B1, B2, params, options.attention, CBias1(800, 600, 600, 360, 120, 1));
+    % elseif idx >= 50
+    G = calculateGCellActivities(B1, B2, params, options.attention, CBias1(800, 600, 600, 360, 120, 1));
+    % end
 
     if options.debug
         % Average B1 and B2 over orientations and the entire array (calculate one scalar)

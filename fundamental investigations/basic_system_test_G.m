@@ -1,9 +1,9 @@
 path = 'output/feedback/20250611_Basic_System_Symmary/10';
-
+close all;
 iterations = 200;
 alphaB = 0.36;
 betaB = 1;
-gammaB = 5;
+gammaB = 12;
 zetaB = 0.9;
 lambdaB = 5;
 xiB = 0;
@@ -13,17 +13,37 @@ betaG = 1;
 gammaG = 2;
 zetaG = 1;
 
-tests = zeros(6, 2, 3);
+%%
+params.iterations = 100;
+params.oris = deg2rad([0, 90]);
+params.num_ori = length(params.oris);
+
+params.B.alpha = 0.36;
+params.B.beta = 1;
+params.B.gamma = 12;
+params.B.zeta = 0.3;
+params.B.lambda = 5;
+
+params.G.alpha = 0.36;  
+params.G.beta = 1;
+params.G.gamma = 0;
+params.G.zeta = 0.1;
+params.G.mu = 1; % inhibition from opposing B cells
+%%
+
+
+tests = zeros(7, 2, 3);
 %               GL Bias      GR Bias
 tests(1,:,:) = [0   0   0  ; 0   0   0  ];
 tests(2,:,:) = [0.5 0.5 0.5; 0.5 0.5 0.5];
 tests(3,:,:) = [0   1   1  ; 0   0   0  ];
 tests(4,:,:) = [0   1   1  ; 0   0.5 0.5];
 tests(5,:,:) = [0   1   0  ; 0   0   1  ];
-tests(6,:,:) = [0   0.5 0.5; 0   0   0.501  ];
+tests(6,:,:) = [0   0.5 0.5; 0   0   0.5];
+tests(7,:,:) = [0   0.5 0.5; 0   0   1  ];
 tests = tests*0.1;
 
-for test = 1:6
+for test = 1:7
     E = 0;
     GL = 0;
     GR = 0;
@@ -157,7 +177,7 @@ for test = 1:6
                'FontSize', 10);
     
     filename = sprintf('%d_BL_BR.png', test);
-    saveas(gcf, fullfile(path, filename));
+    % saveas(gcf, fullfile(path, filename));
 end
 
-close all;
+% close all;

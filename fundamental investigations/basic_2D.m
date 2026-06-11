@@ -1,29 +1,29 @@
 close all;
 
-savePath = 'G:\Meine Ablage\Studium\Master\Project Border Ownership\FG_RNN\output\feedback\20250918_back_to_2D\C';
+savePath = 'G:\Meine Ablage\Studium\Master\Project Border Ownership\FG_RNN\output\feedback\20251029_param_tuning';
 if ~exist(savePath, 'dir')
     mkdir(savePath);
 end
 
-params.iterations = 50;
+params.iterations = 100;
 params.oris = deg2rad([0, 90]);
 params.num_ori = length(params.oris);
 
 params.B.alpha = 0.36;
 params.B.beta = 1;
-params.B.gamma = 7;
-params.B.zeta = 0.7;
+params.B.gamma = 5;
+params.B.zeta = 0.3;
 params.B.lambda = 5;
 
-params.G.alpha = 0.25;  
+params.G.alpha = 0.36;  
 params.G.beta = 1;
 params.G.gamma = 0;
-params.G.zeta = 0.9;
+params.G.zeta = 0.1;
 params.G.mu = 1; % inhibition from opposing B cells
 params.G.inhibition_filter = gaussianFilter2D(5, 5, 1, 1);
-params.G.RF = makeGRF(1, params.oris+pi/2);
+params.G.RF = makeGRF(1, params.oris+pi/2, "donut");
 
-[G_loc, BV_loc, BH_loc, E_loc] = parseStringMap(getStringMap(1));
+[G_loc, BV_loc, BH_loc, E_loc] = parseStringMap(getStringMap(5));
 
 B_loc = zeros(params.num_ori, size(BH_loc, 1), size(BH_loc, 2));
 B_loc(1, :, :) = BH_loc;
@@ -97,9 +97,9 @@ figure; imagesc(hsv2rgb(getBOS(B1, B2, params))); axis image;
 saveas(gcf, fullfile(savePath, 'BOS.png'));
 
 
-horizontal_locations = [2,5; 8,5; 4,5; 4,6; 4,7];
-vertical_locations = [5,2; 5,4];
-g_locations = [3,5; 5,5; 7,5; 5,3];
+horizontal_locations = [2,2; 2,3; 2,7; 2,11; 2,17];
+vertical_locations = [1,1;];
+g_locations = [1,2; 1,6; 3,2; 3,6];
 
 numVLocations = size(vertical_locations, 1);
 numHLocations = size(horizontal_locations, 1);
